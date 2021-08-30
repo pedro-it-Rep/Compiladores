@@ -1,7 +1,6 @@
 from tkinter.filedialog import askopenfilename
 from Constants.Simbolos import Simbolos
 
-
 class Lexico:
     file_path = askopenfilename()
     maxChar, i = 0, 0
@@ -15,6 +14,7 @@ class Lexico:
     caracter = ""
     lexema = ""
     simbolo = -1
+    aux = []
 
     def Lexico(self):
         source = self.file
@@ -23,10 +23,10 @@ class Lexico:
 
     def Token(self):
         while self.i != self.maxChar:
-            while self.lexema == "Var":
-                self.caracter = self.file.read(1)
-                self.i = self.i + 1
-                print("while1 token")
+            #while self.lexema == "Var":
+               # self.caracter = self.file.read(1)
+                #self.i = self.i + 1
+               # print("while1 token")
 
             while self.caracter == '{' or self.caracter.isspace():
                 if self.caracter == '{':  # Caso seja um comentario, apenas ignora
@@ -44,9 +44,8 @@ class Lexico:
                     self.i = self.i + 1
 
             if self.caracter != -1:
-                print("call pegatoken")
-                self.pegaToken(self, self.i)
-
+                self.aux.append(self.pegaToken(self, self.i))
+        print(self.aux)
         exit("Deu ruim")
 
     def pegaToken(self, i):
@@ -59,12 +58,13 @@ class Lexico:
         elif self.caracter == ":":
             return self.trataAtribuicao(self, i)
         elif self.caracter == "+" or self.caracter == "-" or self.caracter == "*":
-            return self.trataOA(self)
+            return self.trataOA(self, i)
         elif self.caracter == '<' or self.caracter == ">" or self.caracter == "=" or self.caracter == "!":
             return self.trataOR(self, i)
         elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
             return self.trataPontuacao(self)
         else:
+            print(self.aux)
             exit("Erro de caracter")
 
     def trataDigito(self, i):
@@ -198,18 +198,24 @@ class Lexico:
             self.simbolo = Simbolos.Atribuicao
             return id, self.simbolo
 
-    def trataOA(self):
+    def trataOA(self, i):
         op = ""
         op = op + self.caracter
 
         if self.caracter == "+":
             self.simbolo = Simbolos.Mais
+            self.caracter = self.file.read(1)
+            i = i + 1
             return op, self.simbolo
         elif self.caracter == "-":
             self.simbolo = Simbolos.Menos
+            self.caracter = self.file.read(1)
+            i = i + 1
             return op, self.simbolo
         else:
             self.simbolo = Simbolos.Multiplicacao
+            self.caracter = self.file.read(1)
+            i = i + 1
             return op, self.simbolo
 
     def trataOR(self, i):
@@ -236,13 +242,13 @@ class Lexico:
 
             if self.caracter == "=":
                 operadorRelacional = operadorRelacional + self.caracter
-                print("<=")
                 self.caracter = self.file.read(1)
                 i = i + 1
                 self.simbolo = Simbolos.MenorIgual
                 return operadorRelacional, self.simbolo
             else:
-                exit("Caracter Invalido")
+                self.simbolo = Simbolos.Menor
+                return operadorRelacional, self.simbolo
         else:
             if self.caracter == '=':
                 operadorRelacional = operadorRelacional + self.caracter
