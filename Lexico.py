@@ -4,242 +4,278 @@ from Constants.Simbolos import Simbolos
 
 class Lexico:
     file_path = askopenfilename()
-    print(file_path)
+    maxChar, i = 0, 0
     file = open(file_path, "r")
-    line = 0
+    for line in file:
+        #line = line.strip("\n")
+        maxChar += len(line)
+    print("Max: ", maxChar)
+    file.seek(0, 0)
+    print(file_path)
     caracter = ""
     lexema = ""
     simbolo = -1
 
     def Lexico(self):
         source = self.file
-        try:
-            self.caracter = source.read(1)
-            self.Token(self)
-        except:
-            print("error")
+        self.caracter = source.read(1)
+        self.Token(self)
 
     def Token(self):
-        while self.caracter == 10:
-            self.caracter = self.file.read(1)
-            self.line = self.line + 1
-            print("while1 token")
+        while self.i != self.maxChar:
+            while self.lexema == "Var":
+                self.caracter = self.file.read(1)
+                self.i = self.i + 1
+                print("while1 token")
 
-        while self.caracter != -1 and (self.caracter == "{" or self.caracter == 8 or self.caracter == 9):
-            # -1 -> Caracter invalido // 8 -> Escreva // 9 -> Leia
-            if self.caracter == '{':  # Caso seja um comentario, apenas ignora
-                while self.caracter != -1 and self.caracter != '}':
-                    if self.caracter == 10:
-                        self.line = self.line + 1
+            while self.caracter == '{' or self.caracter.isspace():
+                if self.caracter == '{':  # Caso seja um comentario, apenas ignora
+                    while self.caracter != '}':
+                        # Ler o comentario por completo
+                        self.caracter = self.file.read(1)
+                        self.i = self.i + 1
+                        print("while2 e 3 token")
+
                     self.caracter = self.file.read(1)
-                    print("while2 e 3 token")
+                    self.i = self.i + 1
 
-                self.caracter = self.file.read(1)
-                print(self.caracter)
-                self.caracter = self.file.read(1)
-                print(self.caracter)
+                while self.caracter.isspace():
+                    self.caracter = self.file.read(1)
+                    self.i = self.i + 1
 
-            while self.caracter != -1 and (self.caracter == 8 or self.caracter == 9 or self.caracter == 10):
-                if self.caracter == 10:
-                    self.line = self.line + 1
+            if self.caracter != -1:
+                print("call pegatoken")
+                self.pegaToken(self, self.i)
 
-                self.caracter = self.file.read(1)
+        exit("Deu ruim")
 
-        if self.caracter != -1:
-            print("call pegatoken")
-            return self.pegaToken(self)
-
-        return None
-
-    def pegaToken(self):
+    def pegaToken(self, i):
         print("caracter: ", self.caracter)
         if self.caracter.isdigit():
             print("isDigit")
-            return self.trataDigito(self)
+            return self.trataDigito(self, i)
         elif self.caracter.isalpha():
-            return self.trataIeP(self)
+            return self.trataIeP(self, i)
+        elif self.caracter == ":":
+            return self.trataAtribuicao(self, i)
         elif self.caracter == "+" or self.caracter == "-" or self.caracter == "*":
             return self.trataOA(self)
-        elif self.caracter == "<" or self.caracter == ">" or self.caracter == "=":
-            return self.trataOR(self)
-        elif self.caracter == ";" or self.caracter == ":" or self.caracter == "(" or self.caracter == ".":
+        elif self.caracter == '<' or self.caracter == ">" or self.caracter == "=" or self.caracter == "!":
+            return self.trataOR(self, i)
+        elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
             return self.trataPontuacao(self)
         else:
-            print("Error de caracter")
+            exit("Erro de caracter")
 
-    def trataDigito(self):
+    def trataDigito(self, i):
 
-        num = self.caracter
+        num = ""
         self.caracter = self.file.read(1)
+        i = i + 1
         while self.caracter.isdigit():
             num = num + self.caracter
             self.caracter = self.file.read(1)
+            i = i + 1
         self.lexema = num
         self.simbolo = Simbolos.Inteiro
 
         return self.lexema, self.simbolo
 
-    def trataIeP(self):
-        id = self.caracter
+    def trataIeP(self, i):
+        id = ""
         print("ID: ", id)
-        self.caracter = self.file.read(1)
+        # self.caracter = self.file.read(1)
         print("Caracter trataIeP: ", self.caracter)
 
-        while (self.caracter.isalpha() or self.caracter.isdigit()) or self.caracter == "_":  # MORRENDO AQUI
+        while (self.caracter.isalpha() or self.caracter.isdigit()) or self.caracter == "_":
             id = id + self.caracter
+            print("ID2: ", id)
             self.caracter = self.file.read(1)
+            i = i + 1
 
         if id == "programa":
             self.simbolo = Simbolos.Programa
             print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "se":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Se
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "entao":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Entao
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "senao":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Senao
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "enquanto":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Enquanto
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "faca":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Faca
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "inicio":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Inicio
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "fim":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Fim
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "escreva":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Escreva
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "leia":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Leia
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "var":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Var
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "inteiro":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Inteiro
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "booleano":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Booleano
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "verdadeiro":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Verdadeiro
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "falso":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Negativo
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "procedimento":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Procedimento
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "funcao":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Funcao
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "div":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Divisao
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "e":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.E
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "ou":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Ou
+            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "nao":
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             self.simbolo = Simbolos.Nao
-            return id, self.simbolo
-        else:
             print("lexico: ", id + " simbolo: ", self.simbolo)
-            self.simbolo = Simbolos.Identificador
-            return id, self.simbolo
-
-    def trataAtribuicao(self):
-        id = self.caracter
-        self.caracter = self.file.read(1)
-
-        if self.caracter == "=":
-            id = id + self.caracter
-            self.simbolo = Simbolos.Atribuicao
             return id, self.simbolo
         else:
+            self.simbolo = Simbolos.Identificador
+            print("lexico: ", id + " simbolo: ", self.simbolo)
+            return id, self.simbolo
+
+    def trataAtribuicao(self, i):
+        id = ""
+        id = id + self.caracter
+        self.caracter = self.file.read(1)
+        i = i + 1
+
+        if self.caracter != '=':
             self.simbolo = Simbolos.DoisPontos
+            return id, self.simbolo
+        else:
+            id = id + self.caracter
+            self.caracter = self.file.read(1)
+            i = i + 1
+            self.simbolo = Simbolos.Atribuicao
             return id, self.simbolo
 
     def trataOA(self):
-        self.lexema = self.caracter
+        op = ""
+        op = op + self.caracter
+
         if self.caracter == "+":
             self.simbolo = Simbolos.Mais
-            return self.lexema, self.simbolo
+            return op, self.simbolo
         elif self.caracter == "-":
             self.simbolo = Simbolos.Menos
-            return self.lexema, self.simbolo
+            return op, self.simbolo
         else:
             self.simbolo = Simbolos.Multiplicacao
-            return self.lexema, self.simbolo
+            return op, self.simbolo
 
-    def trataOR(self):
+    def trataOR(self, i):
+        operadorRelacional = ""
+        operadorRelacional = operadorRelacional + self.caracter
+        self.caracter = self.file.read(1)
+        i = i + 1
 
-        self.lexema = self.caracter
+        if operadorRelacional == '!':
 
-        if self.caracter == ">":
-            self.simbolo = Simbolos.Maior
-            return self.lexema, self.simbolo
-        elif self.caracter == ">=":
-            self.simbolo = Simbolos.MaiorIgual
-            return self.lexema, self.simbolo
-        elif self.caracter == "=":
-            self.simbolo = Simbolos.Igual
-            return self.lexema, self.simbolo
-        elif self.caracter == "<":
-            self.simbolo = Simbolos.Menor
-            return self.lexema, self.simbolo
-        elif self.caracter == "<=":
-            self.simbolo = Simbolos.MenorIgual
-            return self.lexema, self.simbolo
-        else:
+            if self.caracter == '=':
+                operadorRelacional = operadorRelacional + self.caracter
+                self.caracter = self.file.read(1)
+                i = i + 1
+                self.simbolo = Simbolos.Diferente
+                return operadorRelacional, self.simbolo
+            else:
+                exit("Caracter Invalido")
+        elif operadorRelacional == '=':
             self.simbolo = Simbolos.Diferente
-            return self.lexema, self.simbolo
+            return operadorRelacional, self.simbolo
+
+        elif operadorRelacional == "<":
+
+            if self.caracter == "=":
+                operadorRelacional = operadorRelacional + self.caracter
+                print("<=")
+                self.caracter = self.file.read(1)
+                i = i + 1
+                self.simbolo = Simbolos.MenorIgual
+                return operadorRelacional, self.simbolo
+            else:
+                exit("Caracter Invalido")
+        else:
+            if self.caracter == '=':
+                operadorRelacional = operadorRelacional + self.caracter
+                self.caracter = self.file.read(1)
+                i = i + 1
+                self.simbolo = Simbolos.MaiorIgual
+                return operadorRelacional, self.simbolo
+            else:
+                self.simbolo = Simbolos.Maior
+                return operadorRelacional, self.simbolo
 
     def trataPontuacao(self):
-        self.lexema = self.caracter
+        pontuacao = ""
+        pontuacao = pontuacao + self.caracter
+        self.caracter = self.file.read(1)
 
-        if self.caracter == ";":
+        if pontuacao == ";":
             self.simbolo = Simbolos.PontoVirgula
-            return self.lexema, self.simbolo
-        elif self.caracter == ",":
+            print(";")
+            return pontuacao, self.simbolo
+        elif pontuacao == ",":
             self.simbolo = Simbolos.Virgula
-            return self.lexema, self.simbolo
-        elif self.caracter == "(":
+            print(",")
+            return pontuacao, self.simbolo
+        elif pontuacao == "(":
             self.simbolo = Simbolos.AbreParenteses
-            return self.lexema, self.simbolo
-        elif self.caracter == ")":
+            print("(")
+            return pontuacao, self.simbolo
+        elif pontuacao == ")":
             self.simbolo = Simbolos.FechaParenteses
-            return self.lexema, self.simbolo
+            print(")")
+            return pontuacao, self.simbolo
         else:
             self.simbolo = Simbolos.Ponto
-            return self.lexema, self.simbolo
+            print(".")
+            return pontuacao, self.simbolo
