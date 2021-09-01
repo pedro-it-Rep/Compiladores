@@ -1,6 +1,7 @@
 from tkinter.filedialog import askopenfilename
 from Constants.Simbolos import Simbolos
 
+
 class Lexico:
     file_path = askopenfilename()
     maxChar, i = 0, 0
@@ -23,18 +24,14 @@ class Lexico:
 
     def Token(self):
         while self.i != self.maxChar:
-            #while self.lexema == "Var":
-               # self.caracter = self.file.read(1)
-                #self.i = self.i + 1
-               # print("while1 token")
-
             while self.caracter == '{' or self.caracter.isspace():
                 if self.caracter == '{':  # Caso seja um comentario, apenas ignora
                     while self.caracter != '}':
                         # Ler o comentario por completo
                         self.caracter = self.file.read(1)
                         self.i = self.i + 1
-                        print("while2 e 3 token")
+                        if self.i == self.maxChar:
+                            exit("EOF")
 
                     self.caracter = self.file.read(1)
                     self.i = self.i + 1
@@ -45,13 +42,12 @@ class Lexico:
 
             if self.caracter != -1:
                 self.aux.append(self.pegaToken(self, self.i))
-        print(self.aux)
+        print("Print Vet: ", self.aux)
         exit("Deu ruim")
 
     def pegaToken(self, i):
         print("caracter: ", self.caracter)
         if self.caracter.isdigit():
-            print("isDigit")
             return self.trataDigito(self, i)
         elif self.caracter.isalpha():
             return self.trataIeP(self, i)
@@ -235,7 +231,7 @@ class Lexico:
             else:
                 exit("Caracter Invalido")
         elif operadorRelacional == '=':
-            self.simbolo = Simbolos.Diferente
+            self.simbolo = Simbolos.Igual
             return operadorRelacional, self.simbolo
 
         elif operadorRelacional == "<":
@@ -267,21 +263,16 @@ class Lexico:
 
         if pontuacao == ";":
             self.simbolo = Simbolos.PontoVirgula
-            print(";")
             return pontuacao, self.simbolo
         elif pontuacao == ",":
             self.simbolo = Simbolos.Virgula
-            print(",")
             return pontuacao, self.simbolo
         elif pontuacao == "(":
             self.simbolo = Simbolos.AbreParenteses
-            print("(")
             return pontuacao, self.simbolo
         elif pontuacao == ")":
             self.simbolo = Simbolos.FechaParenteses
-            print(")")
             return pontuacao, self.simbolo
         else:
             self.simbolo = Simbolos.Ponto
-            print(".")
             return pontuacao, self.simbolo
