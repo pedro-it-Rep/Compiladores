@@ -36,4 +36,5 @@ class Simbolos:
     Ou = "sou"
     Nao = "snao"
     DoisPontos = "sdoispontos"
-
+    Positivo = "positivo"
+    Negativo = "negativo"
