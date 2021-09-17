@@ -36,5 +36,8 @@ class Simbolos:
     Ou = "sou"
     Nao = "snao"
     DoisPontos = "sdoispontos"
-    Positivo = "positivo"
-    Negativo = "negativo"
+    Positivo = "spositivo"
+    Negativo = "snegativo"
+    Verdadeiro = "sverdadeiro" #FALLEN
+    Falso = "sfalso"
+
