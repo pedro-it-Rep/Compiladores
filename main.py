@@ -1,4 +1,4 @@
-from Lexico import Lexico
+from Sintatico import Sintatico
 
 if __name__ == '__main__':
-    Lexico.Lexico(Lexico)
+    Sintatico.Sintatico(Sintatico)

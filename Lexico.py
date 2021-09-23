@@ -1,6 +1,7 @@
 from tkinter.filedialog import askopenfilename
 from Constants.Simbolos import Simbolos
 
+
 # Remove Aux // Arrumar a Linha
 
 class Lexico:
@@ -15,14 +16,11 @@ class Lexico:
     caracter = ""
     lexema = ""
     simbolo = -1
-    aux = []
-
-    def Lexico(self):
-        source = self.file
-        self.caracter = source.read(1)
-        self.Token(self)
+    tokens = []
 
     def Token(self):
+        source = self.file
+        self.caracter = source.read(1)
         while self.i != self.maxChar:
             while self.caracter == '{' or self.caracter.isspace():
                 if self.caracter == '{':  # Caso seja um comentario, apenas ignora
@@ -43,8 +41,12 @@ class Lexico:
                     self.n_line = self.n_line + 1
 
             if self.caracter != -1:
-                return self.pegaToken(self, self.i)
-        print("Print Vet: ", self.aux)
+                self.tokens = self.pegaToken(self, self.i)
+                self.lexema = self.tokens[0]
+                self.simbolo = self.tokens[1]
+                # print("Pega token :", self.tokens)
+                break
+        # print("Print Vet: ", self.tokens)
         return None
 
     def pegaToken(self, i):
@@ -60,9 +62,9 @@ class Lexico:
         elif self.caracter == '<' or self.caracter == ">" or self.caracter == "=" or self.caracter == "!":
             return self.trataOR(self, i)
         elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
-            return self.trataPontuacao(self)
+            return self.trataPontuacao()
         else:
-            exit("Analisador Lexico -> Linha : " + (Lexico.n_line + 1) + " // Caracter Invalido: " + self.caracter + ".")
+            exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
 
     def trataDigito(self, i):
 
@@ -230,7 +232,7 @@ class Lexico:
                 self.simbolo = Simbolos.Diferente
                 return operadorRelacional, self.simbolo
             else:
-                exit("Analisador Lexico -> Linha : " + (Lexico.n_line + 1) + " // Caracter Invalido '!'.")
+                exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
         elif operadorRelacional == '=':
             self.simbolo = Simbolos.Igual
             return operadorRelacional, self.simbolo

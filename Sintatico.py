@@ -1,197 +1,194 @@
 from Lexico import Lexico
 from Constants.Simbolos import Simbolos
+from Constants.Errors import Errors
+from Models.TableSimbolos import TabelaDeSimbolos
 
 
 class Sintatico:
-    tokenReturn = []
-    lexico = Lexico
-    endFile = ""
 
     def Sintatico(self):
+        Lexico.Token(Lexico)
+        if Lexico.simbolo == Simbolos.Programa:
+            Lexico.Token(Lexico)
 
-        self.tokenReturn = Lexico.Token(self.lexico)
-        if self.tokenReturn.simbolo == Simbolos.Programa:
-            self.tokenReturn = Lexico.Token(self.lexico)
-
-            if self.tokenReturn.simbolo == Simbolos.Identificador:
+            if Lexico.simbolo == Simbolos.Identificador:
                 # insere_tabela(token.lexema, "nomedoprograma","","")
-                self.tokenReturn = Lexico.Token(self.lexico)
+                Lexico.Token(Lexico)
+                if Lexico.simbolo == Simbolos.PontoVirgula:
+                    self.analisaBloco()
 
-                if self.tokenReturn.simbolo == Simbolos.PontoVirgula:
-                    self.analisaBloco(self)
+                    if Lexico.simbolo == Simbolos.Ponto:
+                        Lexico.Token(Lexico)
 
-                    if self.tokenReturn.simbolo == Simbolos.Ponto:
-                        self.tokenReturn = Lexico.Token(self.lexico)
-
-                        if self.tokenReturn is None:
+                        if Lexico.i == Lexico.maxChar:
                             print("Sucesso")
                             return
                         else:
-                            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "código após finalização do programa.")
+                            Errors.exceptionWrongSpace(Errors)
                     else:
-                        exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token '.' esperado.")
+                        Errors.exceptionMissingDot(Errors)
                 else:
-                    exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ';' esperado.")
+                    Errors.exceptionPontoVirgula()
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token identificador esperado.")
+                Errors.exceptionMissingIdentifier(Errors)
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "programa deve iniciar com o token 'programa'.")
+            Errors.exceptionMissingPrograma(Errors)
 
     def analisaBloco(self):
-        self.tokenReturn = Lexico.Token(self.lexico)
-        self.analisa_et_variaveis(self)
-        self.analisaSubrotina(self)
-        self.analisaComandos(self)
+        Lexico.Token(Lexico)
+        self.analisa_et_variaveis()
+        self.analisaSubrotina()
+        self.analisaComandos()
 
-    def analisa_et_variaveis(self, tokenReturn):
+    def analisa_et_variaveis(self):
         if Lexico.simbolo == Simbolos.Var:
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
 
             if Lexico.simbolo == Simbolos.Identificador:
                 while Lexico.simbolo == Simbolos.Identificador:
-                    self.analisaVariaveis(self)
+                    self.analisaVariaveis()
                     if Lexico.simbolo == Simbolos.PontoVirgula:
-                        self.tokenReturn = Lexico.Token(self.lexico)
+                        Lexico.Token(Lexico)
                     else:
-                        exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ';' esperado.")
+                        Errors.ex(Errors)
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token identificador esperado.")
+                Errors.exceptionMissingIdentifier(Errors)
 
     def analisaVariaveis(self):
         while Lexico.simbolo != Simbolos.DoisPontos:
 
-            if self.tokenReturn == Simbolos.Identificador:
+            if Lexico.simbolo == Simbolos.Identificador:
                 # Pesquisa_duplicvar_tabela(token.lexema)
                 # se nao encontrou duplicidade
                 # entao inicio
                 # insere_tablea(tokenReturn, "variavel")
-                self.tokenReturn = Lexico.Token(self.lexico)
-                if self.tokenReturn == Simbolos.Virgula or self.tokenReturn == Simbolos.DoisPontos:
+                Lexico.Token(Lexico)
+                if Lexico.simbolo == Simbolos.Virgula or Lexico.simbolo == Simbolos.DoisPontos:
 
-                    if self.tokenReturn == Simbolos.Virgula:
-                        self.tokenReturn = Lexico.Token(self.lexico)
+                    if Lexico.simbolo == Simbolos.Virgula:
+                        Lexico.Token(Lexico)
 
-                        if self.tokenReturn == Simbolos.DoisPontos:
-                            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token invalido ':' apos ','.")
+                        if Lexico.simbolo == Simbolos.DoisPontos:
+                            Errors.exceptionWrongPontos(Errors)
                 else:
-                    exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ',' ou ':' esperado.")
+                    Errors.exceptionMissingPontos(Errors)
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "nome de variavel, token identificador esperado.")
+                Errors.exceptionVaribleIdentifier(Errors)
 
-        self.tokenReturn = Lexico.Token(self.lexico)
-        self.analisaTipo(self)
+        Lexico.Token(Lexico)
+        self.analisaTipo()
 
     def analisaTipo(self):
-        if self.tokenReturn != Simbolos.Inteiro and self.tokenReturn != Simbolos.Booleano:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "tipo de variavel invalido.")
+        if Lexico.simbolo != Simbolos.Inteiro and Lexico.simbolo != Simbolos.Booleano:
+            Errors.exceptionTypeInvalid()
 
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
 
     def analisaComandos(self):
         if Lexico.simbolo == Simbolos.Inicio:
-            self.tokenReturn = Lexico.Token(self.lexico)
-            self.analisaComandoSimples(self)
+            Lexico.Token(Lexico)
+            self.analisaComandoSimples()
 
             while Lexico.simbolo != Simbolos.Fim:
                 if Lexico.simbolo == Simbolos.PontoVirgula:
-                    self.tokenReturn = Lexico.Token(self.lexico)
+                    Lexico.Token(Lexico)
 
                     if Lexico.simbolo != Simbolos.Fim:
-                        self.analisaComandosSimples(self)
+                        self.analisaComandoSimples()
                 elif Lexico.simbolo != Simbolos.Fim:
-                    exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ';' esperado.")
+                    Errors.exceptionPontoVirgula()
 
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token 'inicio' esperado.")
+            Errors.exceptionMissingStart()
 
     def analisaComandoSimples(self):
         if Lexico.simbolo == Simbolos.Identificador:
             self.analisa_atrib_chprocedimento(self)
         else:
             if Lexico.simbolo == Simbolos.Se:
-                self.analisaSe(self)
+                self.analisaSe()
             elif Lexico.simbolo == Simbolos.Enquanto:
-                self.analiasaEnquanto(self)
+                self.analisaEnquanto()
             elif Lexico.simbolo == Simbolos.Leia:
-                self.analisaLeia(self)
+                self.analisaLeia()
             elif Lexico.simbolo == Simbolos.Escreva:
-                self.analisaEscreva(self)
+                self.analisaEscreva()
             else:
-                self.analisaComando(self)
+                self.analisaComando()
 
     def analisa_atrib_chprocedimento(self):
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
 
         if Lexico.simbolo == Simbolos.Atribuicao:
-            self.analisaAtribuicao(self)
+            self.analisaAtribuicao()
         else:
-            self.chamadaProcedimento(self)
+            self.chamadaProcedimento()
 
     def analisaLeia(self):
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.AbreParenteses:
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
             if Lexico.simbolo == Simbolos.Identificador:
                 # se pesquisa_decvar_tabela(tokenRetun.lexema)
                 # entao inicio (pesquisa em toda a tabela)
-                self.tokenReturn = Lexico.Token(self.lexico)
+                Lexico.Token(Lexico)
 
                 if Lexico.simbolo == Simbolos.FechaParenteses:
-                    self.tokenReturn = Lexico.Token(self.lexico)
+                    Lexico.Token(Lexico)
                 else:
-                    exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ')' esperado.")
+                    Errors.exceptionFechaParenteses()
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token identificador esperado.")
+                Errors.exceptionMissingIdentifier()
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token '(' esperado.")
+            Errors.exceptionAbreParenteses()
 
     def analisaEscreva(self):
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.AbreParenteses:
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
 
             if Lexico.simbolo == Simbolos.Identificador:
                 # se pesquisa_decvarfunc_tabela(token.lexema)
-                self.tokenReturn = Lexico.Token(self.lexico)
+                Lexico.Token(Lexico)
 
                 if Lexico.simbolo == Simbolos.FechaParenteses:
-                    self.tokenReturn = Lexico.Token(self.lexico)
+                    Lexico.Token(Lexico)
                 else:
-                    exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ')' esperado.")
+                    Errors.exceptionFechaParenteses()
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token identificador esperado.")
+                Errors.exceptionMissingIdentifier()
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token '(' esperado.")
+            Errors.exceptionAbreParenteses()
 
     def analisaEnquanto(self):
         # Def auxrot1,auxrot2 inteiro
         # auxrot1:= rotulo
         # Gera(rotulo,NULL,´ ´,´ ´) {início do while}
         # rotulo:= rotulo+1
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
         self.analisaExpressao(self)
 
         if self.tokenReturn == Simbolos.Faca:
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
             self.analisaComandoSimples(self)
 
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "comando enquanto, 'faca' esperado.")
+            Errors.exceptionMissingDo()
 
     def analisaSe(self):
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
         self.analisaExpressao(self)
 
         if Lexico.simbolo == Simbolos.Entao:
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
             self.analisaComandoSimples(self)
 
             if Lexico.simbolo == Simbolos.Senao:
-                self.tokenReturn = Lexico.Token(self.lexico)
+                Lexico.Token(Lexico)
                 self.analisaComandoSimples(self)
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "comando se, 'entao' esperado.")
+            Errors.exceptionInvalidIfDo()
 
     def analisaSubrotina(self):
         # Def. auxrot, flag inteiro
@@ -208,18 +205,42 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.Procedimento:
                 self.analisaDeclaracaoProc(self)
             else:
-                self.analisaDeclaracaoFunc(self)
+                self.analisaDeclaraFunc(self)
 
             if Lexico.simbolo == Simbolos.PontoVirgula:
-                self.tokenReturn = Lexico.Token(self.lexico)
+                Lexico.Token(Lexico)
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ';' esperado.")
+                Errors.exceptionPontoVirgula()
             # if flag = 1
             # então Gera(auxrot,NULL,´ ´,´ ´) {início do principal}
             # fim
 
+    def analisaDeclaraFunc(self):
+        Lexico.Token(Lexico)
+        # nível := “L” (marca ou novo galho)
+        if Lexico.simbolo == Simbolos.Identificador:
+            #pesquisa_declfunc_tabela(token.lexema)
+            #se não encontrou
+            #então início
+            #Insere_tabela(token.lexema,””,nível,rótulo)
+            Lexico.Token(Lexico)
+            if Lexico.simbolo == Simbolos.DoisPontos:
+                Lexico.Token(Lexico)
+                if Lexico.simbolo == Simbolos.Inteiro or Lexico.simbolo == Simbolos.Booleano:
+                    #se(token.símbolo = Sinteger)
+                        #então TABSIMB[pc].tipo :=“função inteiro”
+                    #senão TABSIMB[pc].tipo :=“função boolean”
+                    Lexico.Token(Lexico)
+                    if Lexico.simbolo == Simbolos.PontoVirgula:
+                        self.analisaBloco()
+                Errors.exceptionTypeInvalid()
+            Errors.exceptionMissingPontos()
+            #senao
+        Errors.exceptionMissingIdentifier()
+        #Desempliha ou volta nivel
+
     def analisaDeclaracaoProc(self):
-        self.tokenReturn = Lexico.Token(self.lexico)
+        Lexico.Token(Lexico)
         # nível := “L” (marca ou novo galho)
         if Lexico.simbolo == Simbolos.Identificador:
             # pesquisa_declproc_tabela(token.lexema)
@@ -232,33 +253,33 @@ class Sintatico:
             # rotulo:= rotulo+1
             # self.tokenReturn = Lexico(self)
             if Lexico.simbolo == Simbolos.PontoVirgula:
-                self.analisaBloco(self)
+                self.analisaBloco()
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ';' esperado.")
+                Errors.exceptionPontoVirgula()
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "nome de procedimento, identificador esperado.")
+            Errors.exceptionMissingIdentifier(Errors)
 
     def analisaExpressao(self):
-        self.analisaExpressaoSimples(self)
+        self.analisaExpressaoSimples()
         if Lexico.simbolo == Simbolos.Maior or Lexico.simbolo == Simbolos.MaiorIgual or \
                 Lexico.simbolo == Simbolos.Igual or Lexico.simbolo == Simbolos.Menor or \
                 Lexico.simbolo == Simbolos.MenorIgual or Lexico.simbolo == Simbolos.Diferente:
-            self.tokenReturn = Lexico.Token(self.lexico)
-            self.analisaExpressaoSimples(self)
+            Lexico.Token(Lexico)
+            self.analisaExpressaoSimples()
 
     def analisaExpressaoSimples(self):
         if Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos:
-            self.tokenReturn = Lexico.Token(self.lexico)
-        self.analisaTermo(self)
+            Lexico.Token(Lexico)
+        self.analisaTermo()
         while Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos or Lexico.simbolo == Simbolos.Ou:
-            self.tokenReturn = Lexico.Token(self.lexico)
-            self.analisaTermo(self)
+            Lexico.Token(Lexico)
+            self.analisaTermo()
 
     def analisaTermo(self):
-        self.analisaFator(self)
+        self.analisaFator()
         while Lexico.simbolo == Simbolos.Multiplicacao or Lexico.simbolo == Simbolos.Divisao or Lexico.simbolo == Simbolos.E:
-            self.tokenReturn = Lexico.Token(self.lexico)
-            self.analisaFator(self)
+            Lexico.Token(Lexico)
+            self.analisaFator()
 
     def analisaFator(self):
         if Lexico.simbolo == Simbolos.Identificador:
@@ -272,21 +293,21 @@ class Sintatico:
             # Senão ERRO
             # Fim
         elif Lexico.simbolo == Simbolos.Numero:
-            self.tokenReturn = Lexico.Token(self.lexico)
+            Lexico.Token(Lexico)
         elif Lexico.simbolo == Simbolos.Nao:
-            self.tokenReturn = Lexico.Token(self.lexico)
-            self.analisaFator(self)
+            Lexico.Token(Lexico)
+            self.analisaFator()
         elif Lexico.simbolo == Simbolos.AbreParenteses:
-            self.tokenReturn = Lexico.Token(self.lexico)
-            self.analisaExpressao(self)
+            Lexico.Token(Lexico)
+            self.analisaExpressao()
             if Lexico.simbolo == Simbolos.FechaParenteses:
-                self.tokenReturn = Lexico.Token(self.lexico)
+                Lexico.Token(Lexico)
             else:
-                exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "token ')' esperado.")
-        elif Lexico.simbolo == Simbolos.Verdadeiro or self.tokenReturn.simbolo == Simbolos.Falso:
-            self.tokenReturn = Lexico.Token(self.lexico)
+                Errors.exceptionFechaParenteses()
+        elif Lexico.simbolo == Simbolos.Verdadeiro or Lexico.simbolo == Simbolos.Falso:
+            Lexico.Token(Lexico)
         else:
-            exit("Analisador Sintatico -> Linha : " + (Lexico.n_line + 1) + "invalido na expressao.")
+            Errors.exceptionInvalidExpression()
 
     def chamadaProcedimento(self): # Gerador de codigo
         pass
