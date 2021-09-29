@@ -13,40 +13,35 @@ class Lexico:
     print("Max: ", maxChar)
     file.seek(0, 0)
     print(file_path)
-    caracter = ""
+    caracter = file.read(1)
     lexema = ""
     simbolo = -1
     tokens = []
 
     def Token(self):
-        source = self.file
-        self.caracter = source.read(1)
-        while self.i != self.maxChar:
-            while self.caracter == '{' or self.caracter.isspace():
-                if self.caracter == '{':  # Caso seja um comentario, apenas ignora
-                    while self.caracter != '}':
-                        # Ler o comentario por completo
-                        self.caracter = self.file.read(1)
-                        self.i = self.i + 1
-                        # self.n_line = self.n_line + 1
-                        if self.i == self.maxChar:
-                            exit("Erro Léxico: Comentário não finalizado")
-
+        while self.caracter == '{' or self.caracter.isspace():
+            if self.caracter == '{':  # Caso seja um comentario, apenas ignora
+                while self.caracter != '}':
+                    # Ler o comentario por completo
                     self.caracter = self.file.read(1)
                     self.i = self.i + 1
+                    if self.i == self.maxChar:
+                        exit("Erro Léxico: Comentário não finalizado")
 
-                while self.caracter.isspace():
-                    self.caracter = self.file.read(1)
-                    self.i = self.i + 1
-                    self.n_line = self.n_line + 1
+                self.caracter = self.file.read(1)
+                self.i = self.i + 1
 
-            if self.caracter != -1:
-                self.tokens = self.pegaToken(self, self.i)
-                self.lexema = self.tokens[0]
-                self.simbolo = self.tokens[1]
-                # print("Pega token :", self.tokens)
-                break
-        # print("Print Vet: ", self.tokens)
+            while self.caracter.isspace():
+                print("Space")
+                self.caracter = self.file.read(1)
+                self.i = self.i + 1
+                self.n_line = self.n_line + 1
+
+        if self.caracter != -1:
+            self.tokens = self.pegaToken(self, self.i)
+            self.lexema = self.tokens[0]
+            self.simbolo = self.tokens[1]
+
         return None
 
     def pegaToken(self, i):
@@ -62,7 +57,7 @@ class Lexico:
         elif self.caracter == '<' or self.caracter == ">" or self.caracter == "=" or self.caracter == "!":
             return self.trataOR(self, i)
         elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
-            return self.trataPontuacao()
+            return self.trataPontuacao(self)
         else:
             exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
 
