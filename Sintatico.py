@@ -1,6 +1,6 @@
-from Lexico import Lexico
+#from Lexico import Lexico
 from Constants.Simbolos import Simbolos
-from Constants.Errors import Errors
+from Constants.Errors import *
 #from Models.TabelaSimbolos import TabelaDeSimbolos
 
 
@@ -26,15 +26,15 @@ class Sintatico:
                             print("Sucesso")
                             return
                         else:
-                            Errors.exceptionWrongSpace(Errors)
+                            exceptionWrongSpace()
                     else:
-                        Errors.exceptionMissingDot(Errors)
+                        exceptionMissingDot()
                 else:
-                    Errors.exceptionPontoVirgula(Errors)
+                    exceptionPontoVirgula()
             else:
-                Errors.exceptionMissingIdentifier(Errors)
+                exceptionMissingIdentifier()
         else:
-            Errors.exceptionMissingPrograma(Errors)
+            exceptionMissingPrograma()
 
     def analisaBloco(self):
         Lexico.Token(Lexico)
@@ -52,9 +52,9 @@ class Sintatico:
                     if Lexico.simbolo == Simbolos.PontoVirgula:
                         Lexico.Token(Lexico)
                     else:
-                        Errors.ex(Errors)
+                        exceptionInvalidExpression()
             else:
-                Errors.exceptionMissingIdentifier(Errors)
+                exceptionMissingIdentifier()
 
     def analisaVariaveis(self):
         while Lexico.simbolo != Simbolos.DoisPontos:
@@ -71,18 +71,18 @@ class Sintatico:
                         Lexico.Token(Lexico)
 
                         if Lexico.simbolo == Simbolos.DoisPontos:
-                            Errors.exceptionWrongPontos(Errors)
+                            exceptionWrongPontos()
                 else:
-                    Errors.exceptionMissingPontos(Errors)
+                    exceptionMissingPontos()
             else:
-                Errors.exceptionVaribleIdentifier(Errors)
+                exceptionVaribleIdentifier()
 
         Lexico.Token(Lexico)
         self.analisaTipo(self)
 
     def analisaTipo(self):
         if Lexico.simbolo != Simbolos.Inteiro and Lexico.simbolo != Simbolos.Booleano:
-            Errors.exceptionTypeInvalid(Errors)
+            exceptionTypeInvalid()
 
         Lexico.Token(Lexico)
 
@@ -98,15 +98,14 @@ class Sintatico:
                     if Lexico.simbolo != Simbolos.Fim:
                         self.analisaComandoSimples(self)
                 elif Lexico.simbolo != Simbolos.Fim:
-                    Errors.exceptionPontoVirgula(Errors)
+                    exceptionPontoVirgula()
 
             Lexico.Token(Lexico)
         else:
-            Errors.exceptionMissingStart(Errors)
+            exceptionMissingStart()
 
     def analisaComandoSimples(self):
         if Lexico.simbolo == Simbolos.Identificador:
-            #print("Comando Simples:", Lexico.simbolo)
             self.analisa_atrib_chprocedimento(self)
         else:
             if Lexico.simbolo == Simbolos.Se:
@@ -123,7 +122,6 @@ class Sintatico:
 
     def analisa_atrib_chprocedimento(self):
         Lexico.Token(Lexico)
-        #print("Chamada de Procedimento:", Lexico.simbolo)
 
         if Lexico.simbolo == Simbolos.Atribuicao:
             self.analisaAtribuicao(self)
@@ -142,11 +140,11 @@ class Sintatico:
                 if Lexico.simbolo == Simbolos.FechaParenteses:
                     Lexico.Token(Lexico)
                 else:
-                    Errors.exceptionCloseParenteses(Errors)
+                    exceptionCloseParenteses()
             else:
-                Errors.exceptionMissingIdentifier(Errors)
+                exceptionMissingIdentifier()
         else:
-            Errors.exceptionAbreParenteses(Errors)
+            exceptionAbreParenteses()
 
     def analisaEscreva(self):
         Lexico.Token(Lexico)
@@ -160,11 +158,11 @@ class Sintatico:
                 if Lexico.simbolo == Simbolos.FechaParenteses:
                     Lexico.Token(Lexico)
                 else:
-                    Errors.exceptionFechaParenteses(Errors)
+                    exceptionCloseParenteses()
             else:
-                Errors.exceptionMissingIdentifier(Errors)
+                exceptionMissingIdentifier()
         else:
-            Errors.exceptionAbreParenteses(Errors)
+            exceptionAbreParenteses()
 
     def analisaEnquanto(self):
         # Def auxrot1,auxrot2 inteiro
@@ -179,7 +177,7 @@ class Sintatico:
             self.analisaComandoSimples(self)
 
         else:
-            Errors.exceptionMissingDo(Errors)
+            exceptionMissingDo()
 
     def analisaSe(self):
         print("Espaço?????:", Lexico.lexema)
@@ -195,7 +193,7 @@ class Sintatico:
                 Lexico.Token(Lexico)
                 self.analisaComandoSimples(self)
         else:
-            Errors.exceptionInvalidIfDo(Errors)
+            exceptionInvalidIfDo()
 
     def analisaSubrotina(self):
         # Def. auxrot, flag inteiro
@@ -217,7 +215,7 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.PontoVirgula:
                 Lexico.Token(Lexico)
             else:
-                Errors.exceptionPontoVirgula(Errors)
+                exceptionPontoVirgula()
             # if flag = 1
             # então Gera(auxrot,NULL,´ ´,´ ´) {início do principal}
             # fim
@@ -240,10 +238,9 @@ class Sintatico:
                     Lexico.Token(Lexico)
                     if Lexico.simbolo == Simbolos.PontoVirgula:
                         self.analisaBloco(self)
-                Errors.exceptionTypeInvalid(Errors)
-            Errors.exceptionMissingPontos(Errors)
-            #senao
-        Errors.exceptionMissingIdentifier(Errors)
+                exceptionTypeInvalid()
+            exceptionMissingPontos()
+        exceptionMissingIdentifier()
         #Desempliha ou volta nivel
 
     def analisaDeclaracaoProc(self):
@@ -263,22 +260,16 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.PontoVirgula:
                 self.analisaBloco(self)
             else:
-                #print("Deu ruim aqui")
-                Errors.exceptionPontoVirgula(Errors)
+                exceptionPontoVirgula()
         else:
-            Errors.exceptionMissingIdentifier(Errors)
+            exceptionMissingIdentifier()
 
     def analisaExpressao(self):
-        #print("Entro Analisa Expressão:", Lexico.lexema)
         self.analisaExpressaoSimples(self)
         if Lexico.simbolo == Simbolos.Maior or Lexico.simbolo == Simbolos.MaiorIgual or \
                 Lexico.simbolo == Simbolos.Igual or Lexico.simbolo == Simbolos.Menor or \
                 Lexico.simbolo == Simbolos.MenorIgual or Lexico.simbolo == Simbolos.Diferente:
-            #print("Entra Expressao2:", Lexico.lexema)
-            #print("Lexico caracter:", Lexico.caracter)
             Lexico.Token(Lexico)
-            #print("Entra Expressao2:", Lexico.lexema)
-            #print("Entes do Expressao Simples", Lexico.lexema)
             self.analisaExpressaoSimples(self)
 
 
@@ -287,7 +278,6 @@ class Sintatico:
             Lexico.Token(Lexico)
         self.analisaTermo(self)
         while Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos or Lexico.simbolo == Simbolos.Ou:
-            #print("While do Expressao Simples")
             Lexico.Token(Lexico)
             self.analisaTermo(self)
 
@@ -306,12 +296,11 @@ class Sintatico:
             # Então Se (TabSimb[ind].tipo = “função inteiro”) ou
             # (TabSimb[ind].tipo = “função booleano”)
             # Então
-            # self.analisaFuncao(self)
+            # self.chamadaFuncao(self)
             # Senão Léxico(token)
             # Senão ERRO
             # Fim
         elif Lexico.simbolo == Simbolos.Numero:
-            #print("Entro no analisaFator -> Numero:", Lexico.lexema)
             Lexico.Token(Lexico)
         elif Lexico.simbolo == Simbolos.Nao:
             Lexico.Token(Lexico)
@@ -322,11 +311,11 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.FechaParenteses:
                 Lexico.Token(Lexico)
             else:
-                Errors.exceptionCloseParenteses(Errors)
+                exceptionCloseParenteses()
         elif Lexico.simbolo == Simbolos.Verdadeiro or Lexico.simbolo == Simbolos.Falso:
             Lexico.Token(Lexico)
         else:
-            Errors.exceptionInvalidExpression(Errors)
+            exceptionInvalidExpression()
 
     def analisaAtribuicao(self):
         Lexico.Token(Lexico)
@@ -335,5 +324,5 @@ class Sintatico:
     def chamadaProcedimento(self): # Gerador de codigo
         pass
 
-    def analisaFuncao(self): # Gerador de codigo
+    def chamadaFuncao(self): # Gerador de codigo
         Lexico.Token(Lexico)
