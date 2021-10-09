@@ -10,47 +10,38 @@ class Lexico:
     file = open(file_path, "r")
     for line in file:
         maxChar += len(line)
-    print("Max: ", maxChar)
     file.seek(0, 0)
-    print(file_path)
-    caracter = ""
+    caracter = file.read(1)
     lexema = ""
     simbolo = -1
     tokens = []
 
     def Token(self):
-        source = self.file
-        self.caracter = source.read(1)
-        while self.i != self.maxChar:
-            while self.caracter == '{' or self.caracter.isspace():
-                if self.caracter == '{':  # Caso seja um comentario, apenas ignora
-                    while self.caracter != '}':
-                        # Ler o comentario por completo
-                        self.caracter = self.file.read(1)
-                        self.i = self.i + 1
-                        # self.n_line = self.n_line + 1
-                        if self.i == self.maxChar:
-                            exit("Erro Léxico: Comentário não finalizado")
-
+        while self.caracter == '{' or self.caracter.isspace() and self.caracter != '':
+            if self.caracter == '{':  # Caso seja um comentario, apenas ignora
+                while self.caracter != '}' and self.caracter != '':
+                    # Ler o comentario por completo
                     self.caracter = self.file.read(1)
                     self.i = self.i + 1
 
-                while self.caracter.isspace():
-                    self.caracter = self.file.read(1)
-                    self.i = self.i + 1
-                    self.n_line = self.n_line + 1
+                self.caracter = self.file.read(1)
+                self.i = self.i + 1
 
-            if self.caracter != -1:
-                self.tokens = self.pegaToken(self, self.i)
-                self.lexema = self.tokens[0]
-                self.simbolo = self.tokens[1]
-                # print("Pega token :", self.tokens)
-                break
-        # print("Print Vet: ", self.tokens)
+            while self.caracter.isspace() and self.caracter != '':
+                if self.caracter == '\n':
+                    self.n_line += 1
+                self.caracter = self.file.read(1)
+                self.i = self.i + 1
+
+        if self.caracter != -1 and self.caracter != '':
+            self.tokens = self.pegaToken(self, self.i)
+            self.lexema = self.tokens[0]
+            self.simbolo = self.tokens[1]
+            print("Caracteres: ", self.caracter)
+
         return None
 
     def pegaToken(self, i):
-        print("caracter: ", self.caracter)
         if self.caracter.isdigit():
             return self.trataDigito(self, i)
         elif self.caracter.isalpha():
@@ -62,13 +53,21 @@ class Lexico:
         elif self.caracter == '<' or self.caracter == ">" or self.caracter == "=" or self.caracter == "!":
             return self.trataOR(self, i)
         elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
-            return self.trataPontuacao()
+            return self.trataPontuacao(self)
         else:
+            if self.caracter == '':
+                #self.maxChar -= self.maxChar
+            #if self.i >= self.maxChar:
+                print("Max Char:", self.maxChar)
+                print("I:",self.i)
+                exit("End of program aqui aqui aqui")
+            print("Max Char:", self.maxChar)
             exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
 
     def trataDigito(self, i):
 
         num = ""
+        num = num + self.caracter
         self.caracter = self.file.read(1)
         i = i + 1
         while self.caracter.isdigit():
@@ -76,109 +75,83 @@ class Lexico:
             self.caracter = self.file.read(1)
             i = i + 1
         self.lexema = num
-        self.simbolo = Simbolos.Inteiro
+        self.simbolo = Simbolos.Numero
 
         return self.lexema, self.simbolo
 
     def trataIeP(self, i):
         id = ""
-        print("ID: ", id)
-        # self.caracter = self.file.read(1)
-        print("Caracter trataIeP: ", self.caracter)
 
         while (self.caracter.isalpha() or self.caracter.isdigit()) or self.caracter == "_":
             id = id + self.caracter
-            print("ID2: ", id)
             self.caracter = self.file.read(1)
             i = i + 1
 
         if id == "programa":
             self.simbolo = Simbolos.Programa
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "se":
             self.simbolo = Simbolos.Se
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "entao":
             self.simbolo = Simbolos.Entao
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "senao":
             self.simbolo = Simbolos.Senao
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "enquanto":
             self.simbolo = Simbolos.Enquanto
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "faca":
             self.simbolo = Simbolos.Faca
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "inicio":
             self.simbolo = Simbolos.Inicio
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "fim":
             self.simbolo = Simbolos.Fim
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "escreva":
             self.simbolo = Simbolos.Escreva
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "leia":
             self.simbolo = Simbolos.Leia
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "var":
             self.simbolo = Simbolos.Var
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "inteiro":
             self.simbolo = Simbolos.Inteiro
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "booleano":
             self.simbolo = Simbolos.Booleano
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "verdadeiro":
             self.simbolo = Simbolos.Verdadeiro
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "falso":
             self.simbolo = Simbolos.Negativo
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "procedimento":
             self.simbolo = Simbolos.Procedimento
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "funcao":
             self.simbolo = Simbolos.Funcao
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "div":
             self.simbolo = Simbolos.Divisao
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "e":
             self.simbolo = Simbolos.E
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "ou":
             self.simbolo = Simbolos.Ou
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         elif id == "nao":
             self.simbolo = Simbolos.Nao
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
         else:
             self.simbolo = Simbolos.Identificador
-            print("lexico: ", id + " simbolo: ", self.simbolo)
             return id, self.simbolo
 
     def trataAtribuicao(self, i):
