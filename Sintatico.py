@@ -41,6 +41,7 @@ class Sintatico:
             else:
                 Error.exceptionMissingIdentifier(Lexico.n_line)
         else:
+            print("Inicio:", Lexico.lexema)
             Error.exceptionMissingPrograma(Lexico.n_line)
 
     def analisaBloco(self):
@@ -182,6 +183,8 @@ class Sintatico:
         # rotulo:= rotulo+1
         Lexico.Token(Lexico)
         self.analisaExpressao(self)
+        print("Depois do analisa expressa:",Lexico.lexema)
+        print("Depois do analisa expre:",Lexico.simbolo)
 
         if Lexico.simbolo == Simbolos.Faca:
             Lexico.Token(Lexico)
@@ -294,6 +297,7 @@ class Sintatico:
         if Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos:
             Lexico.Token(Lexico)
         self.analisaTermo(self)
+        print("depois analisa exp simples:",Lexico.lexema)
         while Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos or Lexico.simbolo == Simbolos.Ou:
             Lexico.Token(Lexico)
             self.analisaTermo(self)
@@ -301,6 +305,7 @@ class Sintatico:
     def analisaTermo(self):
         print("Analisa termo:", Lexico.lexema)
         self.analisaFator(self)
+        print("Depois analisa Fator:", Lexico.lexema)
         while Lexico.simbolo == Simbolos.Multiplicacao or Lexico.simbolo == Simbolos.Divisao or Lexico.simbolo == Simbolos.E:
             Lexico.Token(Lexico)
             self.analisaFator(self)
@@ -319,6 +324,7 @@ class Sintatico:
             # Fim
         elif Lexico.simbolo == Simbolos.Numero:
             Lexico.Token(Lexico)
+            print("é o pontos?:",Lexico.lexema)
         elif Lexico.simbolo == Simbolos.Nao:
             Lexico.Token(Lexico)
             self.analisaFator(self)
@@ -330,6 +336,9 @@ class Sintatico:
                 print("Depois fecha parenteses:", Lexico.caracter)
                 print("Depois fecha parenteses2:", Lexico.lexema)
             else:
+                print("Aqui",Lexico.simbolo)
+                print("Aui", Lexico.lexema)
+                print("Error aqui")
                 Error.exceptionCloseParenteses(Lexico.n_line)
         elif Lexico.simbolo == Simbolos.Verdadeiro or Lexico.simbolo == Simbolos.Falso:
             Lexico.Token(Lexico)
