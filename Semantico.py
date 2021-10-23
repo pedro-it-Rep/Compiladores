@@ -1,7 +1,4 @@
-from Models.TabelaSimbolos import TabelaDeSimbolos
-# from Constants.Simbolos import Simbolos
 from Constants.Tipos import Tipos
-# from Lexico import Lexico
 from Sintatico import *
 
 
@@ -32,13 +29,19 @@ class Semantico:
         self.prioridade.append([Simbolos.Positivo, 7])
         self.prioridade.append([Simbolos.AbreParenteses, 0])
 
-    def analisaExpressao(self, sin=Sintatico):
+    def analisaExpressao(self, sin):
 
         types = []
 
         for i in self.expressao:
             self.simbolo = Lexico.simbolo
-            if self.simbolo == Simbolos.Ou or self.lexema == Simbolos.E or self.lexema == Simbolos.Nao or self.lexema == Simbolos.Maior or self.lexema == Simbolos.MaiorIgual or self.lexema == Simbolos.Menor or self.lexema == Simbolos.MenorIgual or self.lexema == Simbolos.Igual or self.lexema == Simbolos.Diferente or self.lexema == Simbolos.Mais or self.lexema == Simbolos.Menos or self.lexema == Simbolos.Multiplicacao or self.lexema == Simbolos.Divisao or self.lexema == Simbolos.Positivo or self.lexema == Simbolos.Negativo:
+            if self.simbolo == Simbolos.Ou or self.simbolo == Simbolos.E or self.simbolo == Simbolos.Nao or \
+                    self.simbolo == Simbolos.Maior or self.simbolo == Simbolos.MaiorIgual or \
+                    self.simbolo == Simbolos.Menor or self.simbolo == Simbolos.MenorIgual or \
+                    self.simbolo == Simbolos.Igual or self.simbolo == Simbolos.Diferente or \
+                    self.simbolo == Simbolos.Mais or self.simbolo == Simbolos.Menos or \
+                    self.simbolo == Simbolos.Multiplicacao or self.simbolo == Simbolos.Divisao or \
+                    self.simbolo == Simbolos.Positivo or self.simbolo == Simbolos.Negativo:
                 if self.simbolo == Simbolos.Positivo or self.simbolo == Simbolos.Negativo:
                     pass
 
@@ -46,21 +49,23 @@ class Semantico:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
                         exit("Operador deve ser aplicado a um Inteiro")
 
-                    types.remove(len[types] - 1)
+                    types.pop(len[types] - 1)
 
-                if self.simbolo == Simbolos.Maior or self.simbolo == Simbolos.MaiorIgual or self.simbolo == Simbolos.Menor or self.simbolo == Simbolos.MenorIgual or self.simbolo == Simbolos.Igual or self.simbolo == Simbolos.Diferente:
+                if self.simbolo == Simbolos.Maior or self.simbolo == Simbolos.MaiorIgual or \
+                        self.simbolo == Simbolos.Menor or self.simbolo == Simbolos.MenorIgual or \
+                        self.simbolo == Simbolos.Igual or self.simbolo == Simbolos.Diferente:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
                         exit("Operador deve ser aplicado a um Inteiro")
 
-                    types.remove(len[types] - 1)
-                    types.remove(len[types] - 1)
+                    types.pop(len[types] - 1)
+                    types.pop(len[types] - 1)
                     types.append(Tipos.Boolean)
 
                 if self.simbolo == Simbolos.Nao or self.simbolo == Simbolos.E or self.simbolo == Simbolos.Ou:
                     if types[len(types) - 1] != Tipos.Boolean and types[len(types) - 2] != Tipos.Boolean:
                         exit("Operador deve ser aplicado a um Booleano")
 
-                    types.remove(len[types] - 1)
+                    types.pop(len[types] - 1)
 
             else:
                 if self.simbolo == Simbolos.Numero:
@@ -82,3 +87,43 @@ class Semantico:
         if sin.tipo == Tipos.BoolFunction or sin.tipo == Tipos.Boolean:
             if types[0] != Tipos.Boolean:
                 exit("Expressao de tipo incompativel")
+
+    def posOrdem(self):
+        posOrdemExpression = []
+        pilha = []
+
+        for i in len(self.expressao):
+            termo = self.expressao[i]
+
+            if termo == Simbolos.Identificador or termo == Simbolos.Numero or termo == Simbolos.Verdadeiro or \
+                    termo == Simbolos.Falso:
+                posOrdemExpression.append(self.expressao[i])
+
+            elif self.simbolo == Simbolos.Ou or self.simbolo == Simbolos.E or self.simbolo == Simbolos.Nao or \
+                    self.simbolo == Simbolos.Maior or self.simbolo == Simbolos.MaiorIgual or \
+                    self.simbolo == Simbolos.Menor or self.simbolo == Simbolos.MenorIgual or \
+                    self.simbolo == Simbolos.Igual or self.simbolo == Simbolos.Diferente or \
+                    self.simbolo == Simbolos.Mais or self.simbolo == Simbolos.Menos or \
+                    self.simbolo == Simbolos.Multiplicacao or self.simbolo == Simbolos.Divisao or \
+                    self.simbolo == Simbolos.Positivo or self.simbolo == Simbolos.Negativo:
+                while pilha is not None and self.prioridade[pilha[-1]] >= self.prioriade[termo]:
+                    posOrdemExpression.append(pilha.pop())
+                pilha.append(self.expressao[i])
+            elif termo == Simbolos.AbreParenteses:
+                pilha.append(self.expressao[i])
+            elif termo == Simbolos.FechaParenteses:
+                while pilha[-1] != Simbolos.AbreParenteses:
+                    posOrdemExpression.append(pilha.pop())
+                pilha.pop()
+            i += 1
+        while pilha is not None:
+            posOrdemExpression.append(pilha.pop())
+
+        return posOrdemExpression
+
+    def removeSimbolo(self, vars):
+        i = 0
+        for self.simbolo in vars[i]:
+            self.simbolo = vars[i]
+            TabelaDeSimbolos.tabela.remove(self.simbolo)
+
