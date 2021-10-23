@@ -63,3 +63,9 @@ def exceptionMissingDot(line_no):
 
 def exceptionMissingStart(line_no):
     exit("Analisador Sintatico -> Linha : {}, missing start.".format((line_no + 1)))
+
+def exceptionDuplicateVariable(line_no):
+    exit("Analisador Semantico -> Linha : {}, variavel já declarada no escopo.".format((line_no + 1)))
+
+def exceptionIdentifierNotDeclared(line_no):
+    exit("Analisador Semantico -> Linha : {}, identificador não declarada.".format((line_no + 1)))
