@@ -9,7 +9,7 @@ class TabelaDeSimbolos:
     tipo = ""
 
     def insere(self, tipo, escopo, end_mem):
-        self.tabela.append([self.lexema, tipo, escopo, end_mem])
+        self.tabela.append([Lexico.lexema, tipo, escopo, end_mem])
 
     def remove(self):
         self.tabela.remove(self.simbolo)
@@ -59,6 +59,7 @@ class TabelaDeSimbolos:
         while i > 0:  # and not novo escopo
             if self.tabela[i] == self.lexema:
                 return True
+            i -= 1
         return False
 
     def isDeclarado(self):
