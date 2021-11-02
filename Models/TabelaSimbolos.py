@@ -66,4 +66,3 @@ class TabelaDeSimbolos:
             self.simbolo = self.tabela
             if self.simbolo == self.lexema:  # REVER
                 return True
-        return False
