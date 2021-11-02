@@ -38,6 +38,6 @@ class Simbolos:
     DoisPontos = "sdoispontos"
     Positivo = "spositivo"
     Negativo = "snegativo"
-    Verdadeiro = "sverdadeiro" #FALLEN
+    Verdadeiro = "sverdadeiro"
     Falso = "sfalso"
 

@@ -63,3 +63,24 @@ def exceptionMissingDot(line_no):
 
 def exceptionMissingStart(line_no):
     exit("Analisador Sintatico -> Linha : {}, missing start.".format((line_no + 1)))
+
+def nameAlreadyUsed(line_no):
+    exit("Name in line already used")
+
+def doubleVariable(line_no):
+    exit("Nome de variavel ja usada")
+
+def semanticoVariable():
+    exit("Nome de variavel ja utilizada")
+
+def nomeProc():
+    exit("Nome de procimento já usado anteriormente")
+
+def nomeFunc():
+    exit("Nome de funçao usada anteriormente")
+
+def notNome():
+    exit("Nome não declarado")
+
+def expressaoIncompativel(line_no):
+    exit("Expressao Incompativel:{}").format((line_no + 1))
