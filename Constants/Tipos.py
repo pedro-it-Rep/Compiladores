@@ -1,9 +1,9 @@
 class Tipos:
-    NomePrograma = 0
-    Variavel = 1
-    Inteiro = 2
-    Boolean = 3
-    IntFunction = 4
-    BoolFunction = 5
-    Function = 6
-    Procedimento = 7
+    NomedoPrograma = "main"
+    Variavel = "variable"
+    Inteiro = "inteiro"
+    Booleano = "booleano"
+    IntFunction = "int_func"
+    BoolFunction = "bool_func"
+    Function = "func"
+    Procedimento = "proc"
