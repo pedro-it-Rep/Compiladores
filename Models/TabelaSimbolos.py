@@ -9,7 +9,7 @@ class TabelaDeSimbolos:
     tipo = ""
 
     def insere(self, tipo, escopo, end_mem):
-        self.tabela.append([Lexico.lexema, tipo, escopo, end_mem])
+        self.tabela.append([self.lexema, tipo, escopo, end_mem])
 
     def remove(self):
         self.tabela.remove(self.simbolo)
@@ -17,6 +17,7 @@ class TabelaDeSimbolos:
     def searchIndex(self):
         # Passa por todos os elementos do vetor -> for (x : tabela)
         for self.simbolo in self.tabela:
+            self.lexema = self.tabela
             if Lexico.lexema == self.lexema:
                 return self.tabela.index(self.simbolo)
         return -1
@@ -30,6 +31,7 @@ class TabelaDeSimbolos:
 
     def alteraTipo(self):
         for self.simbolo in self.tabela:
+            self.simbolo = self.tabela
             if self.simbolo == Tipos.Variavel and (self.tipo == Tipos.Inteiro or self.tipo == Tipos.Boolean):
                 # setTipo
                 pass
@@ -57,11 +59,11 @@ class TabelaDeSimbolos:
         while i > 0:  # and not novo escopo
             if self.tabela[i] == self.lexema:
                 return True
-            i -= 1
         return False
 
     def isDeclarado(self):
         for self.simbolo in self.tabela:
+            self.simbolo = self.tabela
             if self.simbolo == self.lexema:  # REVER
                 return True
         return False
