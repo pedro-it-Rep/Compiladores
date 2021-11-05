@@ -149,10 +149,10 @@ class Semantico:
                         types.append(Tipos.Booleano)
                 elif token == Simbolos.Verdadeiro or token == Simbolos.Falso:
                     types.append(Tipos.Booleano)
-        if expreanterior[1] == Tipos.IntFunction or expreanterior[1] == Tipos.Inteiro:
+        if expreanterior == Tipos.IntFunction or expreanterior == Tipos.Inteiro:
             if Tipos.Inteiro != types[0]:
                 exit("Expressao Incompativel")
-        if expreanterior[1] == Tipos.BoolFunction or expreanterior[1] == Tipos.Booleano:
+        if expreanterior == Tipos.BoolFunction or expreanterior == Tipos.Booleano:
             if Tipos.Booleano != types[0]:
                 exit("Expressao booleano incompativel")
 
@@ -199,3 +199,9 @@ class Semantico:
         while pilha:
             self.posOrdemExpression.append(pilha.pop())
         return self.posOrdemExpression
+
+    def removeSimbolo(self, vars):
+        i = 0
+        for self.simbolo in vars[i]:
+            self.simbolo = vars[i]
+            TabelaDeSimbolos.tabela.remove(self.simbolo)
