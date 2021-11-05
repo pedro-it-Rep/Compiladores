@@ -1,5 +1,4 @@
-from Constants.Errors import nameAlreadyUsed
-
+from Constants.Tipos import Tipos
 
 class TabelaDeSimbolos:
     tabela = []
@@ -23,31 +22,31 @@ class TabelaDeSimbolos:
             self.i -= 1
         self.tabela[self.i][2] = ""
 
-    def PesquisaDuplicVarTabela(self, name):
-        self.i = len(self.tabela) - 1
-        print(self.i)
-        print(self.tabela[self.i][1])
-        while self.tabela[self.i][2] != self.marca:
-            if self.tabela[self.i][0] == name and self.tabela[self.i][1] == self.variavel:
-                exit("Existe variavel duplicada")
+    def removeVar(self, variables):
+        self.simbolo = variables
+        self.tabela.remove(self.simbolo)
+
+    def isDeclaradoNoEscopo(self, Lexema): #REVER LOGICA DO ESCOPO
+        i = len(self.tabela) - 1
+        while i > 0:  # and not novo escopo
+            if self.tabela[i][0] == Lexema:
                 return True
-            self.i -= 1
-        while self.tabela[self.i][1] != self.principal:
-            if self.tabela[self.i][0] == name and self.tabela[self.i][1] == self.variavel:
-                exit("Existe algum procedimento ou função com esse mesmo nome")
+            i -= 1
+        return False
+
+    def search(self, Lexema):
+        for self.lexema in self.tabela:
+            if self.lexema == Lexema:
                 return True
-            self.i -= 1
         return False
 
     def colocaTipo(self, tipo):
         self.i = len(self.tabela) - 1
-        print(self.i)
         while self.tabela[self.i][1] != self.principal and self.i > 0:
             if self.tabela[self.i][1] == self.variavel:
                 self.tabela[self.i][1] = tipo
             self.i -= 1
-            print(self.i)
-            print(self.tabela)
+
 
     def searchNameVariable(self, namevar):
         self.i = len(self.tabela) - 1
@@ -57,13 +56,15 @@ class TabelaDeSimbolos:
             self.i -= 1
         return False
 
-    def searchNameProc(self, nameproc):
-        self.i = len(self.tabela) - 1
-        while self.tabela[self.i][1] != self.principal:
-            if self.tabela[self.i][0] == nameproc and self.tabela[self.i][1] == self.procedimento:
-                return True
-            self.i -= 1
-        return False
+
+    def getVariables(self):
+        variables = []
+        i = len(self.tabela) - 1
+        while i > 0:  # and is novo escopo
+            if self.tabela[i] == Tipos.Inteiro or self.tabela[i] == Tipos.Boolean:
+                variables.append(self.tabela[i])
+            i -= 1
+        return variables
 
     def searchNameFunc(self, namefunc):
         self.i = len(self.tabela) - 1
@@ -72,15 +73,3 @@ class TabelaDeSimbolos:
                 return True
             self.i -= 1
         return False
-
-    def search(self, nome):
-        self.i = len(self.tabela) - 1
-        while self.tabela[self.i][1] != self.principal:
-            if self.tabela[self.i][0] == nome and (self.tabela[self.i][1] == "inteiro" or self.tabela[self.i][1] == "booleano"):
-                self.id = self.tabela[self.i]
-                return True
-            self.i -= 1
-        print("Nome não existe")
-        return False
-
-
