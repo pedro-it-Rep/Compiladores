@@ -1,5 +1,6 @@
 from Constants.Tipos import Tipos
 
+
 class TabelaDeSimbolos:
     tabela = []
     simbolo = ""
@@ -15,61 +16,54 @@ class TabelaDeSimbolos:
     def insereTabela(self, nome, tipo, escopo, mem):
         self.tabela.append([nome, tipo, escopo, mem])
 
-    def remove(self):
+    def remove(self, variable):
+        self.tabela.remove(variable)
+
+    def buscaIdex(self, lexema):
+        for i in self.tabela:
+            if i == lexema:
+                return self.tabela.index(i)
+        return -1
+
+    def busca(self, lexema):
+        Index = self.buscaIdex(self, lexema)
+        funcLexema = self.tabela[Index]
+        if funcLexema is not None:
+            return funcLexema
+        else:
+            return None
+
+    def alteraTipo(self, tipo):
+        for i in self.tabela:
+            if i[1] == Tipos.Variavel and (tipo == Tipos.Inteiro or tipo == Tipos.Boolean):
+                i[1] = tipo
+            if i[1] == Tipos.Function and (tipo == Tipos.IntFunction or tipo == Tipos.BoolFunction):
+                i[1] = tipo
+
+    def removeEscopo(self):
         self.i = len(self.tabela) - 1
-        while self.tabela[self.i][2] != self.marca:
-            self.tabela.pop()
+        while self.i > 0 and self.tabela[self.i][2] is not True:
             self.i -= 1
-        self.tabela[self.i][2] = ""
-
-    def removeVar(self, variables):
-        self.simbolo = variables
-        self.tabela.remove(self.simbolo)
-
-    def isDeclaradoNoEscopo(self, Lexema): #REVER LOGICA DO ESCOPO
-        i = len(self.tabela) - 1
-        while i > 0:  # and not novo escopo
-            if self.tabela[i][0] == Lexema:
-                return True
-            i -= 1
-        return False
-
-    def search(self, Lexema):
-        for self.lexema in self.tabela:
-            if self.lexema == Lexema:
-                return True
-        return False
-
-    def colocaTipo(self, tipo):
-        self.i = len(self.tabela) - 1
-        while self.tabela[self.i][1] != self.principal and self.i > 0:
-            if self.tabela[self.i][1] == self.variavel:
-                self.tabela[self.i][1] = tipo
-            self.i -= 1
-
-
-    def searchNameVariable(self, namevar):
-        self.i = len(self.tabela) - 1
-        while self.tabela[self.i][1] != self.principal:
-            if self.tabela[self.i][0] == namevar:
-                return True
-            self.i -= 1
-        return False
-
+        self.tabela[self.i][2] = False
 
     def getVariables(self):
         variables = []
         i = len(self.tabela) - 1
-        while i > 0:  # and is novo escopo
-            if self.tabela[i] == Tipos.Inteiro or self.tabela[i] == Tipos.Boolean:
+        while i > 0 and self.tabela[self.i][2] is not True:
+            if self.tabela[i][1] == Tipos.Inteiro or self.tabela[i][1] == Tipos.Boolean:
                 variables.append(self.tabela[i])
             i -= 1
         return variables
 
-    def searchNameFunc(self, namefunc):
-        self.i = len(self.tabela) - 1
-        while self.tabela[self.i][1] != self.principal:
-            if self.tabela[self.i][1] == namefunc:
+    def isDeclaradoNoEscopo(self, lexema):
+        i = len(self.tabela) - 1
+        while i > 0 and self.tabela[self.i][2] is not True:
+            if self.tabela[i][0] == lexema:
                 return True
-            self.i -= 1
+        return False
+
+    def isDeclarado(self, lexema):
+        for i in self.tabela:
+            if i[0] == lexema:
+                return True
         return False
