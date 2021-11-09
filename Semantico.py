@@ -200,8 +200,6 @@ class Semantico:
             self.posOrdemExpression.append(pilha.pop())
         return self.posOrdemExpression
 
-    def removeSimbolo(self, vars):
-        i = 0
-        for self.simbolo in vars[i]:
-            self.simbolo = vars[i]
-            TabelaDeSimbolos.tabela.remove(self.simbolo)
+    def removeSimbolo(self, variables):
+        for i in variables:
+            TabelaDeSimbolos.remove(TabelaDeSimbolos, i)
