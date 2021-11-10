@@ -5,12 +5,7 @@ class TabelaDeSimbolos:
     tabela = []
     simbolo = ""
     lexema = ""
-    marca = "X"
-    principal = "main"
-    variavel = "variable"
-    procedimento = "procedimento"
     mem = 0
-    i = 0
     id = []
 
     def insereTabela(self, nome, tipo, escopo, mem):
@@ -21,7 +16,7 @@ class TabelaDeSimbolos:
 
     def buscaIdex(self, lexema):
         for i in self.tabela:
-            if i == lexema:
+            if i[0] == lexema:
                 return self.tabela.index(i)
         return -1
 
@@ -41,15 +36,15 @@ class TabelaDeSimbolos:
                 i[1] = tipo
 
     def removeEscopo(self):
-        self.i = len(self.tabela) - 1
-        while self.i > 0 and self.tabela[self.i][2] is not True:
-            self.i -= 1
-        self.tabela[self.i][2] = False
+        i = len(self.tabela) - 1
+        while i > 0 and self.tabela[i][2] is not True:
+            i -= 1
+        self.tabela[i][2] = False
 
     def getVariables(self):
         variables = []
         i = len(self.tabela) - 1
-        while i > 0 and self.tabela[self.i][2] is not True:
+        while i > 0 and self.tabela[i][2] is not True:
             if self.tabela[i][1] == Tipos.Inteiro or self.tabela[i][1] == Tipos.Boolean:
                 variables.append(self.tabela[i])
             i -= 1
@@ -57,9 +52,10 @@ class TabelaDeSimbolos:
 
     def isDeclaradoNoEscopo(self, lexema):
         i = len(self.tabela) - 1
-        while i > 0 and self.tabela[self.i][2] is not True:
+        while i > 0 and self.tabela[i][2] is not True:
             if self.tabela[i][0] == lexema:
                 return True
+            i -= 1
         return False
 
     def isDeclarado(self, lexema):
