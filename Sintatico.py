@@ -27,7 +27,7 @@ class Sintatico:
             Lexico.Token(Lexico)
 
             if Lexico.simbolo == Simbolos.Identificador:
-                TabelaDeSimbolos.insereTabela(TabelaDeSimbolos, Lexico.lexema, Tipos.NomePrograma, True, None)
+                TabelaDeSimbolos.insereTabela(TabelaDeSimbolos, Lexico.lexema, Tipos.NomedoPrograma, True, None)
                 Lexico.Token(Lexico)
 
                 if Lexico.simbolo == Simbolos.PontoVirgula:
@@ -35,7 +35,7 @@ class Sintatico:
                     variables = TabelaDeSimbolos.getVariables(TabelaDeSimbolos)
                     GeradorDeCodigo.geraComando2Var(GeradorDeCodigo, Comandos.Deallocate,
                                                     (self.proxEnd - len(variables)), len(variables))
-                    Semantico.removeSimbolo(variables)
+                    Semantico.removeSimbolo(Semantico, variables)
                     TabelaDeSimbolos.removeEscopo(TabelaDeSimbolos)
                     self.proxEnd -= len(variables)
 
@@ -45,6 +45,7 @@ class Sintatico:
                         Lexico.Token(Lexico)
 
                         if Lexico.caracter == "":
+                            print("Sucesso")
                             return
                         else:
                             Error.exceptionWrongSpace(Lexico.n_line)
@@ -223,7 +224,7 @@ class Sintatico:
         self.expressao = Semantico.posOrdem(Semantico, self.expressao)
         self.geraExpressao(self)
         self.tipo = Tipos.Boolean
-        print(self.expressao)
+        #self.identificador = ['se', Tipos.Boolean, False, None]
         Semantico.analisaExpressao(Semantico, self.expressao, self.tipo, self.identificador[0])
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.JumpIfFalse, self.proxRotulo)
         aux2 = self.proxRotulo
@@ -306,13 +307,12 @@ class Sintatico:
                         if Lexico.simbolo == Simbolos.PontoVirgula:
                             self.analisaBloco(self)
                             variables = TabelaDeSimbolos.getVariables(TabelaDeSimbolos)
-                            print("RemoveS 2 -> variables ->", variables)
                             Semantico.removeSimbolo(Semantico, variables)
                             TabelaDeSimbolos.removeEscopo(TabelaDeSimbolos)
                             self.proxEnd -= len(variables)
                             GeradorDeCodigo.geraComando(GeradorDeCodigo, Comandos.Return)
                             self.proxEnd -= 2
-                            GeradorDeCodigo.geraRotulo(aux)
+                            GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux)
                     else:
                         Error.exceptionTypeInvalid(Lexico.n_line)
                 else:
@@ -367,10 +367,7 @@ class Sintatico:
 
     def analisaExpressaoSimples(self):
         if Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos:
-            if Lexico.simbolo == Simbolos.Mais:
-                TabelaDeSimbolos.tabela.append("+u")
-            else:
-                TabelaDeSimbolos.tabela.append("-u")
+            self.expressao.append([Lexico.lexema, Lexico.simbolo])
             Lexico.Token(Lexico)
         self.analisaTermo(self)
         while Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos or Lexico.simbolo == Simbolos.Ou:
@@ -423,6 +420,7 @@ class Sintatico:
         self.subUnarios(self)
         self.expressao = Semantico.posOrdem(Semantico, self.expressao)
         self.geraExpressao(self)
+        self.tipo = Tipos.Inteiro
         Semantico.analisaExpressao(Semantico, self.expressao, self.tipo, self.identificador[0])
         nVars = len(TabelaDeSimbolos.getVariables(TabelaDeSimbolos))
 
@@ -435,7 +433,6 @@ class Sintatico:
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Call, self.identificador[3])
 
     def chamadaFuncao(self):  # Gerador de codigo
-        Lexico.Token(Lexico)
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadConst, 0)
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Call, self.found[3])
 

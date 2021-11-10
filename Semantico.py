@@ -106,9 +106,7 @@ class Semantico:
                 if self.termo == Simbolos.Numero:
                     types.append(Tipos.Inteiro)
                 if self.termo == Simbolos.Identificador:
-                    print(lexema)
                     aux = TabelaDeSimbolos.busca(TabelaDeSimbolos, lexema)
-                    print(aux)
                     if aux[1] == Tipos.Inteiro or aux[1] == Tipos.IntFunction:
                         types.append(Tipos.Inteiro)
                     elif aux[1] == Tipos.Boolean or aux[1] == Tipos.BoolFunction:
