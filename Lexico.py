@@ -37,7 +37,6 @@ class Lexico:
             self.tokens = self.pegaToken(self, self.i)
             self.lexema = self.tokens[0]
             self.simbolo = self.tokens[1]
-            print("Caracteres: ", self.caracter)
 
         return None
 
@@ -58,10 +57,7 @@ class Lexico:
             if self.caracter == '':
                 #self.maxChar -= self.maxChar
             #if self.i >= self.maxChar:
-                print("Max Char:", self.maxChar)
-                print("I:",self.i)
                 exit("End of program aqui aqui aqui")
-            print("Max Char:", self.maxChar)
             exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
 
     def trataDigito(self, i):
