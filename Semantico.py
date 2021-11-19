@@ -49,42 +49,41 @@ class Semantico:
         else:
             return False
 
-    def analisaExpressao(self, expressao, tipo, lexema):
+    def analisaExpressao(self, expressao, tipo, lexema, flag):
         types = []
         for self.termo in expressao:
-            if self.termo == Simbolos.Ou or \
-                    self.termo == Simbolos.E or \
-                    self.termo == Simbolos.Nao or \
-                    self.termo == Simbolos.Maior or \
-                    self.termo == Simbolos.MaiorIgual or \
-                    self.termo == Simbolos.Menor or \
-                    self.termo == Simbolos.MenorIgual or \
-                    self.termo == Simbolos.Igual or \
-                    self.termo == Simbolos.Diferente or \
-                    self.termo == Simbolos.Mais or \
-                    self.termo == Simbolos.Menos or \
-                    self.termo == Simbolos.Multiplicacao or \
-                    self.termo == Simbolos.Divisao or \
-                    self.termo == Simbolos.Positivo or \
-                    self.termo == Simbolos.Negativo:
-                if self.termo == Simbolos.Nao or\
-                        self.termo == Simbolos.Positivo or\
-                        self.termo == Simbolos.Negativo:
+            if self.termo[1] == Simbolos.Ou or \
+                    self.termo[1] == Simbolos.E or \
+                    self.termo[1] == Simbolos.Nao or \
+                    self.termo[1] == Simbolos.Maior or \
+                    self.termo[1] == Simbolos.MaiorIgual or \
+                    self.termo[1] == Simbolos.Menor or \
+                    self.termo[1] == Simbolos.MenorIgual or \
+                    self.termo[1] == Simbolos.Igual or \
+                    self.termo[1] == Simbolos.Diferente or \
+                    self.termo[1] == Simbolos.Mais or \
+                    self.termo[1] == Simbolos.Menos or \
+                    self.termo[1] == Simbolos.Multiplicacao or \
+                    self.termo[1] == Simbolos.Divisao or \
+                    self.termo[1] == Simbolos.Positivo or \
+                    self.termo[1] == Simbolos.Negativo:
+                if self.termo[1] == Simbolos.Nao or\
+                        self.termo[1] == Simbolos.Positivo or\
+                        self.termo[1] == Simbolos.Negativo:
                     pass
-                if self.termo == Simbolos.E or self.termo == Simbolos.Ou:
+                if self.termo[1] == Simbolos.E or self.termo[1] == Simbolos.Ou:
                     if types[len(types) - 1] != Tipos.Booleano and types[len(types) - 2] != Tipos.Booleano:
                         exit("Erro de tipo bool com int, ou tipo errado")
 
                     x = types[len(types) - 1]
                     types.remove(x)
-                    print(types)
 
-                if self.termo == Simbolos.Maior or \
-                        self.termo == Simbolos.MaiorIgual or \
-                        self.termo == Simbolos.Menor or \
-                        self.termo == Simbolos.MenorIgual or \
-                        self.termo == Simbolos.Igual or \
-                        self.termo == Simbolos.Diferente:
+                if self.termo[1] == Simbolos.Maior or \
+                        self.termo[1] == Simbolos.MaiorIgual or \
+                        self.termo[1] == Simbolos.Menor or \
+                        self.termo[1] == Simbolos.MenorIgual or \
+                        self.termo[1] == Simbolos.Igual or \
+                        self.termo[1] == Simbolos.Diferente:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
                         exit("Erro de tipos")
                     x = types[len(types) - 1]
@@ -93,26 +92,27 @@ class Semantico:
                     types.remove(x)
                     types.append(Tipos.Boolean)
 
-                if self.termo == Simbolos.Mais or \
-                        self.termo == Simbolos.Menos or \
-                        self.termo == Simbolos.Multiplicacao or \
-                        self.termo == Simbolos.Divisao:
+                if self.termo[1] == Simbolos.Mais or \
+                        self.termo[1] == Simbolos.Menos or \
+                        self.termo[1] == Simbolos.Multiplicacao or \
+                        self.termo[1] == Simbolos.Divisao:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
                         exit("ERRO: Operador deve ser aplicado a um inteiro")
                     x = types[len(types) - 1]
                     types.remove(x)
 
             else:
-                if self.termo == Simbolos.Numero:
+                if self.termo[1] == Simbolos.Numero:
                     types.append(Tipos.Inteiro)
-                if self.termo == Simbolos.Identificador:
+                if self.termo[1] == Simbolos.Identificador:
                     aux = TabelaDeSimbolos.busca(TabelaDeSimbolos, lexema)
                     if aux[1] == Tipos.Inteiro or aux[1] == Tipos.IntFunction:
                         types.append(Tipos.Inteiro)
                     elif aux[1] == Tipos.Boolean or aux[1] == Tipos.BoolFunction:
                         types.append(Tipos.Boolean)
-                if self.termo == Simbolos.Verdadeiro or self.termo == Simbolos.Falso:
+                if self.termo[1] == Simbolos.Verdadeiro or self.termo[1] == Simbolos.Falso:
                     types.append(Tipos.Boolean)
+
         if tipo == Tipos.IntFunction or tipo == Tipos.Inteiro:
             if Tipos.Inteiro != types[0]:
                 exit("Expressao Incompativel")
@@ -125,33 +125,34 @@ class Semantico:
         i = 0
         self.posOrdemExpression = []
         for i in range(len(expressaoin)):
-            self.termo = expressaoin[i][1]
-            if self.termo == Simbolos.Identificador or \
-                    self.termo == Simbolos.Numero or \
-                    self.termo == Simbolos.Positivo or \
-                    self.termo == Simbolos.Negativo:
+            self.termo = expressaoin[i]
+            if self.termo[1] == Simbolos.Identificador or \
+                    self.termo[1] == Simbolos.Numero or \
+                    self.termo[1] == Simbolos.Positivo or \
+                    self.termo[1] == Simbolos.Negativo:
                 self.posOrdemExpression.append(self.termo)
-            elif self.termo == Simbolos.Ou or \
-                    self.termo == Simbolos.E or \
-                    self.termo == Simbolos.Nao or \
-                    self.termo == Simbolos.Maior or \
-                    self.termo == Simbolos.MaiorIgual or \
-                    self.termo == Simbolos.Menor or \
-                    self.termo == Simbolos.MenorIgual or \
-                    self.termo == Simbolos.Igual or \
-                    self.termo == Simbolos.Diferente or \
-                    self.termo == Simbolos.Mais or \
-                    self.termo == Simbolos.Menos or \
-                    self.termo == Simbolos.Multiplicacao or \
-                    self.termo == Simbolos.Divisao or \
-                    self.termo == Simbolos.Positivo or \
-                    self.termo == Simbolos.Negativo:
-                while self.pilhaVazia(self, pilha) is False and self.definePrioridades(self, pilha[-1][1]) >= self.definePrioridades(self, self.termo[0][1]):
+            elif self.termo[1] == Simbolos.Ou or \
+                    self.termo[1] == Simbolos.E or \
+                    self.termo[1] == Simbolos.Nao or \
+                    self.termo[1] == Simbolos.Maior or \
+                    self.termo[1] == Simbolos.MaiorIgual or \
+                    self.termo[1] == Simbolos.Menor or \
+                    self.termo[1] == Simbolos.MenorIgual or \
+                    self.termo[1] == Simbolos.Igual or \
+                    self.termo[1] == Simbolos.Diferente or \
+                    self.termo[1] == Simbolos.Mais or \
+                    self.termo[1] == Simbolos.Menos or \
+                    self.termo[1] == Simbolos.Multiplicacao or \
+                    self.termo[1] == Simbolos.Divisao or \
+                    self.termo[1] == Simbolos.Positivo or \
+                    self.termo[1] == Simbolos.Negativo:
+                while self.pilhaVazia(self, pilha) is False and\
+                        self.definePrioridades(self, pilha[-1][1]) >= self.definePrioridades(self, self.termo[1]):
                     self.posOrdemExpression.append(pilha.pop())
                 pilha.append(self.termo)
-            elif self.termo == Simbolos.AbreParenteses:
+            elif self.termo[1] == Simbolos.AbreParenteses:
                 pilha.append(self.termo)
-            elif self.termo == Simbolos.FechaParenteses:
+            elif self.termo[1] == Simbolos.FechaParenteses:
                 while pilha[-1][1] != Simbolos.AbreParenteses:
                     self.posOrdemExpression.append(pilha.pop())
                 pilha.pop()
