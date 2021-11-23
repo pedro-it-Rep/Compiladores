@@ -15,7 +15,6 @@ class Sintatico:
     End = 0
     proxRotulo = 1
     rótulo = 0
-    nível = "X"
     expressao = []
     posexpressao = []
     identificador = []
@@ -30,7 +29,7 @@ class Sintatico:
             Lexico.Token(Lexico)
 
             if Lexico.simbolo == Simbolos.Identificador:
-                TabelaDeSimbolos.insereTabela(TabelaDeSimbolos, Lexico.lexema, Tipos.NomedoPrograma, True, None)
+                TabelaDeSimbolos.insereTabela(TabelaDeSimbolos, Lexico.lexema, Tipos.NomePrograma, True, None)
                 Lexico.Token(Lexico)
 
                 if Lexico.simbolo == Simbolos.PontoVirgula:
@@ -159,6 +158,7 @@ class Sintatico:
 
     def analisa_atrib_chprocedimento(self):
 
+        self.identificador = []
         self.identificador = TabelaDeSimbolos.busca(TabelaDeSimbolos, Lexico.lexema)
         Lexico.Token(Lexico)
 
@@ -201,7 +201,7 @@ class Sintatico:
                         self.chamadaFuncao(self)
                         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadValue, self.proxEnd - 1)
                     else:
-                        GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadValue, self.identificador[3])
+                        GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadValue, self.found[3])
 
                     GeradorDeCodigo.geraComando(GeradorDeCodigo, Comandos.Print)
                     Lexico.Token(Lexico)
@@ -222,12 +222,13 @@ class Sintatico:
         self.proxRotulo += 1
 
         Lexico.Token(Lexico)
+        self.expressao = []
         self.analisaExpressao(self)
         self.subUnarios(self)
         self.expressao = Semantico.posOrdem(Semantico, self.expressao)
         self.geraExpressao(self)
         self.tipo = Tipos.Boolean
-        Semantico.analisaExpressao(Semantico, self.expressao, self.tipo, self.identificador[0], 1)
+        Semantico.analisaExpressao(Semantico, self.expressao, self.tipo)
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.JumpIfFalse, self.proxRotulo)
         aux2 = self.proxRotulo
 
@@ -244,12 +245,13 @@ class Sintatico:
     def analisaSe(self):
 
         Lexico.Token(Lexico)
+        self.expressao = []
         self.analisaExpressao(self)
         self.subUnarios(self)
         self.expressao = Semantico.posOrdem(Semantico, self.expressao)
         self.geraExpressao(self)
         self.tipo = Tipos.Boolean
-        Semantico.analisaExpressao(Semantico, self.expressao, self.tipo, self.identificador[0], 1)
+        Semantico.analisaExpressao(Semantico, self.expressao, self.tipo)
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.JumpIfFalse, self.proxRotulo)
         aux = self.proxRotulo
         self.proxRotulo += 1
@@ -364,7 +366,6 @@ class Sintatico:
             Error.exceptionMissingIdentifier(Lexico.n_line)
 
     def analisaExpressao(self):
-        self.expressao = []
         self.analisaExpressaoSimples(self)
         if Lexico.simbolo == Simbolos.Maior or Lexico.simbolo == Simbolos.MaiorIgual or \
                 Lexico.simbolo == Simbolos.Igual or Lexico.simbolo == Simbolos.Menor or \
@@ -424,12 +425,14 @@ class Sintatico:
 
     def analisaAtribuicao(self):
         Lexico.Token(Lexico)
+
+        self.expressao = []
         self.analisaExpressao(self)
         self.subUnarios(self)
         self.expressao = Semantico.posOrdem(Semantico, self.expressao)
         self.geraExpressao(self)
         self.tipo = Tipos.Inteiro
-        Semantico.analisaExpressao(Semantico, self.expressao, self.tipo, self.identificador[0], 0)
+        Semantico.analisaExpressao(Semantico, self.expressao, self.tipo)
         self.nVars = len(TabelaDeSimbolos.getVariables(TabelaDeSimbolos))
 
         if self.identificador[1] == Tipos.Boolean or self.identificador[1] == Tipos.IntFunction:
