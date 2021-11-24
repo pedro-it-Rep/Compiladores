@@ -15,9 +15,11 @@ class TabelaDeSimbolos:
         self.tabela.remove(variable)
 
     def buscaIdex(self, lexema):
-        for i in self.tabela:
-            if i[0] == lexema:
-                return self.tabela.index(i)
+        i = len(self.tabela) - 1
+        while i > 0:
+            if self.tabela[i][0] == lexema:
+                return i
+            i -= 1
         return -1
 
     def busca(self, lexema):
