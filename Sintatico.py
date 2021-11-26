@@ -261,7 +261,8 @@ class Sintatico:
         if Lexico.simbolo == Simbolos.Entao:
             Lexico.Token(Lexico)
             self.analisaComandoSimples(self)
-            # GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Jump, self.proxRotulo)
+            if Lexico.simbolo != Simbolos.PontoVirgula:
+                GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Jump, self.proxRotulo)
             aux2 = self.proxRotulo
             self.proxRotulo += 1
             GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux)
@@ -269,7 +270,7 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.Senao:
                 Lexico.Token(Lexico)
                 self.analisaComandoSimples(self)
-            # GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux2)
+                GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux2)
         else:
             Error.exceptionInvalidIfDo(Lexico.n_line)
 
