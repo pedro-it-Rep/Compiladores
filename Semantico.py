@@ -49,9 +49,10 @@ class Semantico:
         else:
             return False
 
-    def analisaExpressao(self, expressao, tipo, lexema, flag):
+    def analisaExpressao(self, expressao, tipo):
         types = []
         for self.termo in expressao:
+            print(self.termo)
             if self.termo[1] == Simbolos.Ou or \
                     self.termo[1] == Simbolos.E or \
                     self.termo[1] == Simbolos.Nao or \
@@ -105,7 +106,7 @@ class Semantico:
                 if self.termo[1] == Simbolos.Numero:
                     types.append(Tipos.Inteiro)
                 if self.termo[1] == Simbolos.Identificador:
-                    aux = TabelaDeSimbolos.busca(TabelaDeSimbolos, lexema)
+                    aux = TabelaDeSimbolos.busca(TabelaDeSimbolos, self.termo[0])
                     if aux[1] == Tipos.Inteiro or aux[1] == Tipos.IntFunction:
                         types.append(Tipos.Inteiro)
                     elif aux[1] == Tipos.Boolean or aux[1] == Tipos.BoolFunction:
