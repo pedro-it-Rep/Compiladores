@@ -3,7 +3,6 @@ class Comandos:
     Allocate = "ALLOC"
     Deallocate = "DALLOC"
     Halt = "HLT"
-    Label = "L"
     LoadConst = "LDC"
     LoadValue = "LDV"
     Add = "ADD"

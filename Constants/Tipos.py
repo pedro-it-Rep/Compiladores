@@ -1,8 +1,8 @@
 class Tipos:
-    NomedoPrograma = "main"
+    NomePrograma = "main"
     Variavel = "variable"
     Inteiro = "inteiro"
-    Booleano = "booleano"
+    Boolean = "booleano"
     IntFunction = "int_func"
     BoolFunction = "bool_func"
     Function = "func"
