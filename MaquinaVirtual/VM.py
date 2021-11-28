@@ -52,7 +52,6 @@ class VM:
                 else:
                     self.geral.append(self.instru)
                     self.instru = ''
-            #self.geral.insert(0, self.instru)
             self.geralzao.append(self.geral)
             self.geral = []
         self.geralzao.pop()
@@ -186,7 +185,6 @@ class VM:
     def newObjfile(self,tv):
         self.maxSize = len(self.geralzao)
         self.l = 0
-        #'' falta o comentario
         while self.l < self.maxSize:
             if self.geralzao[self.l][1] == "START":
                 tv.insert('', 'end', values=(self.geralzao[self.l][0], self.geralzao[self.l][1], '', '', ''))

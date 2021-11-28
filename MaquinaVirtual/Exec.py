@@ -188,6 +188,7 @@ class Exec:
                 # Button == False
                 self.endProg = 1
                 self.printStack(self)
+                self.flag = 1
 
             elif self.operation == "STR":
                 # M[n] := M[s]; s:=s - 1;
@@ -458,7 +459,6 @@ class Exec:
                     button.pack()
                     self.createdButton = 1
                 self.top.wait_variable(self.number)
-                #button.destroy()
                 self.pilha.append([len(self.pilha), self.number.get()])
                 self.pc += 1
 
@@ -519,5 +519,3 @@ class Exec:
 
     def insertValue(self):
         self.number.set(self.entry.get())
-        #self.pilha.append([len(self.pilha), self.number])
-        #self.pc += 1

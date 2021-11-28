@@ -6,6 +6,7 @@ from MaquinaVirtual.Exec import Exec
 class VMUI:
 
     app = Tk()
+    app.resizable(False, False)
 
     framepc = LabelFrame(app, text="Instruções", font=(20))
     frametv = LabelFrame(app, text="Código", font=(20))
@@ -18,7 +19,7 @@ class VMUI:
     tv3 = ttk.Treeview(frameoutput, columns='Dados', show='headings')
     tv4 = ttk.Treeview(framepc, column=("Endereço","PC"), show="headings", heigh=2)
 
-    button = Button(app, text="Compilas", state="disabled")
+    button = Button(app, text="Compilar", state="disabled")
 
     type_comp = -1
 
@@ -39,7 +40,6 @@ class VMUI:
         filemenu.add_command(label="Open",command=lambda:self.lerArquivo(self))
         menubar.add_cascade(label="File", menu=filemenu)
 
-        #button = Button(self.app, text="Compilas", state="disabled", command=self.comp(self))
         self.button.grid(row=0, column=1, sticky=NE, padx=10, pady=10)
         self.button["command"]=lambda :self.comp(self)
 
@@ -54,30 +54,24 @@ class VMUI:
         self.tv.heading('Atributo 2', text='ATRIBUTO 2')
         self.tv.heading('Comentário', text='COMENTÁRIO')
         self.tv.grid(row=1, column=0, sticky=W, pady=10, padx=20)
-            # tv.pack()
 
-        #tv2 = ttk.Treeview(self.app, columns=('Endereço', 'Valor'), show='headings', height=15)
         self.tv2.column('Endereço', minwidth=0, width=125)
         self.tv2.column('Valor', minwidth=0, width=125)
         self.tv2.heading('Endereço', text='Endereço')
         self.tv2.heading('Valor', text='Valor')
         self.tv2.grid(row=1, column=1, sticky=NE, pady=10, padx=3)
-        # tv2.pack()
 
-        #tv3 = ttk.Treeview(self.app, columns='Dados', show='headings')
         self.tv3.column('Dados', minwidth=0, width=150)
         self.tv3.heading('Dados', text='Dados')
         self.tv3.grid(row=2, column=0, sticky=SW, padx=20, pady=15)
-        # tv3.pack()
 
-        #tv4 = ttk.Treeview(framepc, column="PC", show="headings",heigh=2)
         self.tv4.column("Endereço", minwidth=0, width=100)
         self.tv4.column("PC", minwidth=0, width=100)
         self.tv4.heading("Endereço", text="Endereço")
         self.tv4.heading("PC",text="PC")
         self.tv4.grid(column= 3, row= 3, sticky=S, padx=9, pady=5)
 
-        frameradio = LabelFrame(self.app, text="Sla", font=(20))
+        frameradio = LabelFrame(self.app, text="Modo de Compilar", font=(20))
         frameradio.grid(column=1, row=2, sticky=W)
         radioB1 = Radiobutton(frameradio, text="Default", command=lambda : self.printar(self,0))
         radioB1.grid(sticky=W)
@@ -112,6 +106,7 @@ class VMUI:
             Exec.exec(Exec)
             if Exec.flag == 1:
                 VM.printOutput(VM, Exec.saida, self.tv3)
+                Exec.flag = 0
         else:
             print("Entro pelo menos")
 
