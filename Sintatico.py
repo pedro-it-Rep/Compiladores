@@ -1,4 +1,4 @@
-import Constants.Errors as Error
+from Constants.Errors import Errors
 from Constants.Simbolos import Simbolos
 from Lexico import Lexico
 from Models.TabelaSimbolos import TabelaDeSimbolos
@@ -19,6 +19,8 @@ class Sintatico:
     posexpressao = []
     identificador = []
     nVars = 0
+    tela1 = None
+    Errors.sla = tela1
 
     def Sintatico(self):
         GeradorDeCodigo.isCreated(GeradorDeCodigo)
@@ -52,15 +54,15 @@ class Sintatico:
                             print("Sucesso")
                             return
                         else:
-                            Error.exceptionWrongSpace(Lexico.n_line)
+                            Errors.exceptionWrongSpace(Errors, Lexico.n_line)
                     else:
-                        Error.exceptionMissingDot(Lexico.n_line)
+                        Errors.exceptionMissingDot(Errors, Lexico.n_line)
                 else:
-                    Error.exceptionPontoVirgula(Lexico.n_line)
+                    Errors.exceptionPontoVirgula(Errors, Lexico.n_line)
             else:
-                Error.exceptionMissingIdentifier(Lexico.n_line)
+                Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
         else:
-            Error.exceptionMissingPrograma(Lexico.n_line)
+            Errors.exceptionMissingPrograma(Errors, Lexico.n_line)
 
     def analisaBloco(self):
         Lexico.Token(Lexico)
@@ -78,9 +80,9 @@ class Sintatico:
                     if Lexico.simbolo == Simbolos.PontoVirgula:
                         Lexico.Token(Lexico)
                     else:
-                        Error.exceptionInvalidExpression(Lexico.n_line)
+                        Errors.exceptionInvalidExpression(Errors, Lexico.n_line)
             else:
-                Error.exceptionMissingIdentifier(Lexico.n_line)
+                Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
 
     def analisaVariaveis(self):
         self.nVars = 0
@@ -97,13 +99,13 @@ class Sintatico:
                             Lexico.Token(Lexico)
 
                             if Lexico.simbolo == Simbolos.DoisPontos:
-                                Error.exceptionWrongPontos(Lexico.n_line)
+                                Errors.exceptionWrongPontos(Errors, Lexico.n_line)
                     else:
-                        Error.exceptionMissingPontos(Lexico.n_line)
+                        Errors.exceptionMissingPontos(Errors,Lexico.n_line)
                 else:
-                    Error.semanticoVariable()
+                    Errors.semanticoVariable(Errors, Lexico.n_line)
             else:
-                Error.exceptionVaribleIdentifier(Lexico.n_line)
+                Errors.exceptionVaribleIdentifier(Errors, Lexico.n_line)
 
         GeradorDeCodigo.geraComando2Var(GeradorDeCodigo, Comandos.Allocate, self.proxEnd, self.nVars)
         self.proxEnd += self.nVars
@@ -113,7 +115,7 @@ class Sintatico:
 
     def analisaTipo(self):
         if Lexico.simbolo != Simbolos.Inteiro and Lexico.simbolo != Simbolos.Booleano:
-            Error.exceptionTypeInvalid(Lexico.n_line)
+            Errors.exceptionTypeInvalid(Errors, Lexico.n_line)
 
         if Lexico.simbolo == Simbolos.Inteiro:
             TabelaDeSimbolos.alteraTipo(TabelaDeSimbolos, Tipos.Inteiro)
@@ -135,17 +137,17 @@ class Sintatico:
                     if Lexico.simbolo != Simbolos.Fim:
                         self.analisaComandoSimples(self)
                 else:
-                    Error.exceptionPontoVirgula(Lexico.n_line)
+                    Errors.exceptionPontoVirgula(Errors, Lexico.n_line)
             Lexico.Token(Lexico)
         else:
-            Error.exceptionMissingStart(Lexico.n_line)
+            Errors.exceptionMissingStart(Errors, Lexico.n_line)
 
     def analisaComandoSimples(self):
         if Lexico.simbolo == Simbolos.Identificador:
             if TabelaDeSimbolos.isDeclarado(TabelaDeSimbolos, Lexico.lexema):
                 self.analisa_atrib_chprocedimento(self)
             else:
-                Error.exceptionIdentifierNotDeclared(Lexico.n_line)
+                Errors.exceptionIdentifierNotDeclared(Errors, Lexico.n_line)
         else:
             if Lexico.simbolo == Simbolos.Se:
                 self.analisaSe(self)
@@ -183,13 +185,13 @@ class Sintatico:
                     if Lexico.simbolo == Simbolos.FechaParenteses:
                         Lexico.Token(Lexico)
                     else:
-                        Error.exceptionCloseParenteses(Lexico.n_line)
+                        Errors.exceptionCloseParenteses(Errors, Lexico.n_line)
                 else:
-                    Error.exceptionMissingIdentifier(Lexico.n_line)
+                    Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
             else:
-                exit("Identificador esperado")
+                Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
         else:
-            Error.exceptionAbreParenteses(Lexico.n_line)
+            Errors.exceptionAbreParenteses(Errors, Lexico.n_line)
 
     def analisaEscreva(self):
         Lexico.Token(Lexico)
@@ -211,13 +213,13 @@ class Sintatico:
                     if Lexico.simbolo == Simbolos.FechaParenteses:
                         Lexico.Token(Lexico)
                     else:
-                        Error.exceptionCloseParenteses(Lexico.n_line)
+                        Errors.exceptionCloseParenteses(Errors, Lexico.n_line)
                 else:
-                    Error.exceptionMissingIdentifier(Lexico.n_line)
+                    Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
             else:
-                exit("Identificador faltante")
+                Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
         else:
-            Error.exceptionAbreParenteses(Lexico.n_line)
+            Errors.exceptionAbreParenteses(Errors, Lexico.n_line)
 
     def analisaEnquanto(self):
         aux = self.proxRotulo
@@ -240,7 +242,7 @@ class Sintatico:
             GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Jump, aux)
 
         else:
-            Error.exceptionMissingDo(Lexico.n_line)
+            Errors.exceptionMissingDo(Errors, Lexico.n_line)
 
         GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux2)
 
@@ -272,7 +274,7 @@ class Sintatico:
                 self.analisaComandoSimples(self)
                 GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux2)
         else:
-            Error.exceptionInvalidIfDo(Lexico.n_line)
+            Errors.exceptionInvalidIfDo(Errors, Lexico.n_line)
 
     def analisaSubrotina(self):
         self.nVars = 0
@@ -291,7 +293,7 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.PontoVirgula:
                 Lexico.Token(Lexico)
             else:
-                Error.exceptionPontoVirgula(Lexico.n_line)
+                Errors.exceptionPontoVirgula(Errors, Lexico.n_line)
         if flag == 1:
             GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux)
 
@@ -324,13 +326,13 @@ class Sintatico:
                             self.proxEnd -= len(variables)
                             GeradorDeCodigo.geraComando(GeradorDeCodigo, Comandos.Return)
                     else:
-                        Error.exceptionTypeInvalid(Lexico.n_line)
+                        Errors.exceptionTypeInvalid(Errors, Lexico.n_line)
                 else:
-                    Error.exceptionMissingPontos(Lexico.n_line)
+                    Errors.exceptionMissingPontos(Errors, Lexico.n_line)
             else:
-                Error.nomeFunc(Lexico.n_line)
+                Errors.nomeFunc(Errors, Lexico.n_line)
         else:
-            Error.exceptionMissingIdentifier(Lexico.n_line)
+            Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
         TabelaDeSimbolos.removeEscopo(TabelaDeSimbolos)
 
     def analisaDeclaracaoProc(self):
@@ -358,11 +360,11 @@ class Sintatico:
                     self.proxEnd -= len(variables)
                     GeradorDeCodigo.geraComando(GeradorDeCodigo, Comandos.Return)
                 else:
-                    Error.exceptionPontoVirgula(Lexico.n_line)
+                    Errors.exceptionPontoVirgula(Errors, Lexico.n_line)
             else:
-                Error.nomeProc(Lexico.n_line)
+                Errors.nomeProc(Errors, Lexico.n_line)
         else:
-            Error.exceptionMissingIdentifier(Lexico.n_line)
+            Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
 
     def analisaExpressao(self):
         self.analisaExpressaoSimples(self)
@@ -399,7 +401,7 @@ class Sintatico:
                 self.expressao.append([Lexico.lexema, Lexico.simbolo])
                 Lexico.Token(Lexico)
             else:
-                Error.notNome()
+                Errors.exceptionIdentifierNotDeclared(Errors, Lexico.n_line)
         elif Lexico.simbolo == Simbolos.Numero:
             self.expressao.append([Lexico.lexema, Lexico.simbolo])
             Lexico.Token(Lexico)
@@ -415,12 +417,12 @@ class Sintatico:
                 self.expressao.append([Lexico.lexema, Lexico.simbolo])
                 Lexico.Token(Lexico)
             else:
-                Error.exceptionCloseParenteses(Lexico.n_line)
+                Errors.exceptionCloseParenteses(Errors, Lexico.n_line)
         elif Lexico.simbolo == Simbolos.Verdadeiro or Lexico.simbolo == Simbolos.Falso:
             self.expressao.append([Lexico.lexema, Lexico.simbolo])
             Lexico.Token(Lexico)
         else:
-            Error.exceptionInvalidExpression(Lexico.n_line)
+            Errors.exceptionInvalidExpression(Errors, Lexico.n_line)
 
     def analisaAtribuicao(self):
         Lexico.Token(Lexico)
@@ -480,7 +482,7 @@ class Sintatico:
                     if self.found[1] == Tipos.Inteiro or self.found[1] == Tipos.Boolean:
                         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadValue, self.found[3])
                 else:
-                    Error.exceptionIdentifierNotDeclared(Lexico.n_line)
+                    Errors.exceptionIdentifierNotDeclared(Errors, Lexico.n_line)
             elif i[1] == Simbolos.Numero:
                 GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadConst, i[0])
             elif i[1] == Simbolos.Verdadeiro:
