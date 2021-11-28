@@ -1,6 +1,7 @@
 from Constants.Simbolos import Simbolos
 from Models.TabelaSimbolos import TabelaDeSimbolos
 from Constants.Tipos import Tipos
+from Constants.Errors import Errors
 
 
 class Semantico:
@@ -73,8 +74,9 @@ class Semantico:
                         self.termo[1] == Simbolos.Negativo:
                     pass
                 if self.termo[1] == Simbolos.E or self.termo[1] == Simbolos.Ou:
-                    if types[len(types) - 1] != Tipos.Booleano and types[len(types) - 2] != Tipos.Booleano:
-                        exit("Erro de tipo bool com int, ou tipo errado")
+                    if types[len(types) - 1] != Tipos.Boolean and types[len(types) - 2] != Tipos.Boolean:
+                        #exit("Erro de tipo bool com int, ou tipo errado")
+                        Errors.conflictTypeBool(Errors)
 
                     x = types[len(types) - 1]
                     types.remove(x)
@@ -86,7 +88,8 @@ class Semantico:
                         self.termo[1] == Simbolos.Igual or \
                         self.termo[1] == Simbolos.Diferente:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
-                        exit("Erro de tipos")
+                        #exit("Erro de tipos")
+                        Errors.conflictTypeInt(Errors)
                     x = types[len(types) - 1]
                     types.remove(x)
                     x = types[len(types) - 1]
@@ -98,7 +101,8 @@ class Semantico:
                         self.termo[1] == Simbolos.Multiplicacao or \
                         self.termo[1] == Simbolos.Divisao:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
-                        exit("ERRO: Operador deve ser aplicado a um inteiro")
+                        #exit("ERRO: Operador deve ser aplicado a um inteiro")
+                        Errors.aplicationType(Errors)
                     x = types[len(types) - 1]
                     types.remove(x)
 
@@ -116,10 +120,12 @@ class Semantico:
 
         if tipo == Tipos.IntFunction or tipo == Tipos.Inteiro:
             if Tipos.Inteiro != types[0]:
-                exit("Expressao Incompativel")
+                #exit("Expressao Incompativel")
+                Errors.checkTypeInt(Errors)
         if tipo == Tipos.BoolFunction or tipo == Tipos.Boolean:
             if Tipos.Boolean != types[0]:
-                exit("Expressao booleano incompativel")
+                #exit("Expressao booleano incompativel")
+                Errors.checkTypeBool(Errors)
 
     def posOrdem(self, expressaoin):
         pilha = []

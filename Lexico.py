@@ -1,20 +1,17 @@
 from tkinter.filedialog import askopenfilename
 from Constants.Simbolos import Simbolos
+from Constants.Errors import Errors
 
 
 # Remove Aux // Arrumar a Linha
 
 class Lexico:
-    file_path = askopenfilename()
+    file_path = None
+    file = None
     maxChar, i, n_line = 0, 0, 0
-    file = open(file_path, "r")
-    for line in file:
-        maxChar += len(line)
-    file.seek(0, 0)
-    caracter = file.read(1)
+    caracter = ''
     lexema = ""
     simbolo = -1
-    tokens = []
 
     def Token(self):
         while self.caracter == '{' or self.caracter.isspace() and self.caracter != '':
@@ -58,7 +55,9 @@ class Lexico:
                 #self.maxChar -= self.maxChar
             #if self.i >= self.maxChar:
                 exit("End of program aqui aqui aqui")
-            exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
+            #exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
+            Errors.checkCaracter(Errors, self.n_line, self.caracter)
+
 
     def trataDigito(self, i):
 
@@ -201,7 +200,8 @@ class Lexico:
                 self.simbolo = Simbolos.Diferente
                 return operadorRelacional, self.simbolo
             else:
-                exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
+                #exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
+                Errors.checkCaracter(Errors, self.n_line, self.caracter)
         elif operadorRelacional == '=':
             self.simbolo = Simbolos.Igual
             return operadorRelacional, self.simbolo
@@ -248,3 +248,11 @@ class Lexico:
         else:
             self.simbolo = Simbolos.Ponto
             return pontuacao, self.simbolo
+
+    def readfile(self):
+        #self.file = open(self.file_path, "r")
+        self.file = self.file_path
+        for line in self.file:
+            self.maxChar += len(line)
+        self.file.seek(0, 0)
+        self.caracter = self.file.read(1)
