@@ -293,7 +293,9 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.PontoVirgula:
                 Lexico.Token(Lexico)
             else:
+
                 Errors.exceptionPontoVirgula(Errors, Lexico.n_line)
+
         if flag == 1:
             GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux)
 

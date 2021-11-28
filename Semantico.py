@@ -53,6 +53,7 @@ class Semantico:
     def analisaExpressao(self, expressao, tipo):
         types = []
         for self.termo in expressao:
+            print(self.termo)
             if self.termo[1] == Simbolos.Ou or \
                     self.termo[1] == Simbolos.E or \
                     self.termo[1] == Simbolos.Nao or \
