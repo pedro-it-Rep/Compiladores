@@ -1,10 +1,24 @@
-from tkinter.filedialog import askopenfilename
+#                           Modulo Lexical
+# Direitos reservados por Fabricio Silva Cardoso e Pedro Ignácio Trevisan
+#
+# Programa responsavel por analisar de forma lexical um arquivo recebido, onde
+# este tem como caracteristicas ser parecido com a linguagem Pascal.
+#
+# Este modulo é responsavel por identificar os caracteres lidos de um arquivo
+# de entrada e transforma-los em simbolos, onde estes serão analisados nos outros
+# modulos desenvolvidos (Semantico.py e Sintatico.py).
+#
+# Todos os simbolos estão disponiveis no arquivo Simbolos.py
+#
+# O intuito do programa é fazer uma analise completa da linguagem proposta
+# pelo professor a ponto de compor um sistema, sendo este o nosso compilador.
+
+
 from Constants.Simbolos import Simbolos
 from Constants.Errors import Errors
 
 
-# Remove Aux // Arrumar a Linha
-
+# Definição da classe. Definido desta forma para facilitar na transmissão das informações entre os modulos
 class Lexico:
     file_path = None
     file = None
@@ -13,6 +27,7 @@ class Lexico:
     lexema = ""
     simbolo = -1
 
+    # Função principal, responsavel por iniciar o fluxo principal do programa
     def Token(self):
         while self.caracter == '{' or self.caracter.isspace() and self.caracter != '':
             if self.caracter == '{':  # Caso seja um comentario, apenas ignora
@@ -25,19 +40,23 @@ class Lexico:
                 self.i = self.i + 1
 
             while self.caracter.isspace() and self.caracter != '':
+                # Por alguns problemas durante o desenvolvimento, é necessário verificar quando temos que pular linha
                 if self.caracter == '\n':
                     self.n_line += 1
                 self.caracter = self.file.read(1)
                 self.i = self.i + 1
 
         if self.caracter != -1 and self.caracter != '':
+            # Self.tokens recebe os lexemas e os simbolos, ficando com a seguinte informação: [Lexema, Simbolo]
             self.tokens = self.pegaToken(self, self.i)
             self.lexema = self.tokens[0]
             self.simbolo = self.tokens[1]
 
         return None
 
+    # Responsavel por verificar qual é o tipo do caracter lido
     def pegaToken(self, i):
+        # Recebe o caracter do fluxo principal e verifica qual seu tipo e qual função deve ser chamada
         if self.caracter.isdigit():
             return self.trataDigito(self, i)
         elif self.caracter.isalpha():
@@ -51,20 +70,16 @@ class Lexico:
         elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
             return self.trataPontuacao(self)
         else:
-            if self.caracter == '':
-                #self.maxChar -= self.maxChar
-            #if self.i >= self.maxChar:
-                exit("End of program aqui aqui aqui")
-            #exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
             Errors.checkCaracter(Errors, self.n_line, self.caracter)
 
-
+    # Trata caso o caracter lido seja um digito
     def trataDigito(self, i):
 
         num = ""
         num = num + self.caracter
         self.caracter = self.file.read(1)
         i = i + 1
+        # Podemos ter digitos com várias casas, então é necessario verificar isso
         while self.caracter.isdigit():
             num = num + self.caracter
             self.caracter = self.file.read(1)
@@ -72,8 +87,12 @@ class Lexico:
         self.lexema = num
         self.simbolo = Simbolos.Numero
 
+        # Retorna o numero lido e o seu simbolo correspondente
         return self.lexema, self.simbolo
 
+    # IeP = Idenficador e Palavra Reservada
+    # Função responsavel por verificar se alguma declaração feita durante o programa está utilizando alguma
+    # palavra reservada, caso não esteja então temos a declaração de um Identificador (Váriavel).
     def trataIeP(self, i):
         id = ""
 
@@ -82,6 +101,7 @@ class Lexico:
             self.caracter = self.file.read(1)
             i = i + 1
 
+        # Bonito? Não, porém a utilização de switch case não funcionou conforme esperado
         if id == "programa":
             self.simbolo = Simbolos.Programa
             return id, self.simbolo
@@ -149,12 +169,14 @@ class Lexico:
             self.simbolo = Simbolos.Identificador
             return id, self.simbolo
 
+    # Realiza a tratativa de uma atribuição a um identificador
     def trataAtribuicao(self, i):
         id = ""
         id = id + self.caracter
         self.caracter = self.file.read(1)
         i = i + 1
 
+        # Atribuição é identificada com ':=', então é necessario verificar se a ordem está sendo seguida
         if self.caracter != '=':
             self.simbolo = Simbolos.DoisPontos
             return id, self.simbolo
@@ -165,6 +187,9 @@ class Lexico:
             self.simbolo = Simbolos.Atribuicao
             return id, self.simbolo
 
+    # OA = Operador Aritmético
+    # Trata os simbolos aritméticos.
+    # OBS: O simbolo de divisão é identificado por DIVI, por isso não tratamos ele aqui
     def trataOA(self, i):
         op = ""
         op = op + self.caracter
@@ -185,14 +210,19 @@ class Lexico:
             i = i + 1
             return op, self.simbolo
 
+    # OR = Operador Relacional
+    # Verifica se os operadores estão escritos de maneira correta
     def trataOR(self, i):
         operadorRelacional = ""
         operadorRelacional = operadorRelacional + self.caracter
         self.caracter = self.file.read(1)
         i = i + 1
 
+        # Podemos ter !=, <=, <, >=, ==
+        # Durante o desenvolvido, foi feita a verificação na ordem acima
         if operadorRelacional == '!':
 
+            # !=
             if self.caracter == '=':
                 operadorRelacional = operadorRelacional + self.caracter
                 self.caracter = self.file.read(1)
@@ -200,34 +230,40 @@ class Lexico:
                 self.simbolo = Simbolos.Diferente
                 return operadorRelacional, self.simbolo
             else:
-                #exit("Analisador Lexico -> Linha {} :  // Caracter Invalido: {} . ".format(self.n_line, self.caracter))
                 Errors.checkCaracter(Errors, self.n_line, self.caracter)
+        # =
         elif operadorRelacional == '=':
             self.simbolo = Simbolos.Igual
             return operadorRelacional, self.simbolo
 
         elif operadorRelacional == "<":
 
+            # <=
             if self.caracter == "=":
                 operadorRelacional = operadorRelacional + self.caracter
                 self.caracter = self.file.read(1)
                 i = i + 1
                 self.simbolo = Simbolos.MenorIgual
                 return operadorRelacional, self.simbolo
+            # <
             else:
                 self.simbolo = Simbolos.Menor
                 return operadorRelacional, self.simbolo
         else:
+            # >=
             if self.caracter == '=':
                 operadorRelacional = operadorRelacional + self.caracter
                 self.caracter = self.file.read(1)
                 i = i + 1
                 self.simbolo = Simbolos.MaiorIgual
                 return operadorRelacional, self.simbolo
+            # >
             else:
                 self.simbolo = Simbolos.Maior
                 return operadorRelacional, self.simbolo
 
+    # Trata os tipos de pontuação disponiveis no programa
+    # OBS: As chaves ({ }) indicam comentário, então são tratadas no corpo principal do programa e não nessa função
     def trataPontuacao(self):
         pontuacao = ""
         pontuacao = pontuacao + self.caracter
@@ -249,8 +285,8 @@ class Lexico:
             self.simbolo = Simbolos.Ponto
             return pontuacao, self.simbolo
 
+    # Função utilizada para ler o arquivo de entrada
     def readfile(self):
-        #self.file = open(self.file_path, "r")
         self.file = self.file_path
         for line in self.file:
             self.maxChar += len(line)

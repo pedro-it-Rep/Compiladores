@@ -1,3 +1,19 @@
+#                           Modulo Semantico
+# Direitos reservados por Fabricio Silva Cardoso e Pedro Ignácio Trevisan
+#
+# Programa responsavel por analisar de forma semantica o arquivo recebido no modulo lexical.
+#
+# Este modulo é responsavel por atribuir significado as variaveis e expressões encontradas
+# ao longo do programa, onde essa análise e feita utilizando as funções em seu formato
+# pós ordem, onde essa conversão tambem é realizadas nesse arquivo
+#
+# Todos os simbolos estão disponiveis no arquivo Simbolos.py
+# Todos os tipos estão disponiveis no arquivo Tipos.py
+#
+# O intuito do programa é fazer uma analise completa da linguagem proposta
+# pelo professor a ponto de compor um sistema, sendo este o nosso compilador.
+
+
 from Constants.Simbolos import Simbolos
 from Models.TabelaSimbolos import TabelaDeSimbolos
 from Constants.Tipos import Tipos
@@ -10,7 +26,15 @@ class Semantico:
     termo = ""
     lexema = ""
 
+    # Define a prioridade de como os simbolos devem ser tratados
+    # Caso essa prioriade não seja respeitada, teremos um funcionamento incorreto do modulo
+    # Ordem utilizada
+    # Aritméticos: (+ positivo, - negativo) (*,div) (+,-)
+    # Relacionais: (todos iguais)
+    # Lógicos: (não) (e) (ou)
     def definePrioridades(self, prioridade):
+        # Maior valor -> Tratado antes
+        # Ex: 7 * 5 + 10 -> Primeiro trata a multiplicação (Valor 6) e depois a soma (Valor 5)
         if prioridade == Simbolos.Ou:
             return 1
         elif prioridade == Simbolos.E:
@@ -44,16 +68,20 @@ class Semantico:
         else:
             return -1
 
+    # Verifica se nossa pilha está vazia
     def pilhaVazia(self, pilhain):
         if not pilhain:
             return True
         else:
             return False
 
+    # Realiza a analise da nossa expressão pós ordem baseado nas prioridades
     def analisaExpressao(self, expressao, tipo):
         types = []
+        # termo = expressão[i], onde i inicia em 0 e vai até o tamanho máximo de expressão
+        # expressão = [lexema, simbolo], então termo = expressao[i][lexema, simbolo]
         for self.termo in expressao:
-            print(self.termo)
+            # Verifica se é algum simbolo que deve ser inserido na pilha
             if self.termo[1] == Simbolos.Ou or \
                     self.termo[1] == Simbolos.E or \
                     self.termo[1] == Simbolos.Nao or \
@@ -69,15 +97,18 @@ class Semantico:
                     self.termo[1] == Simbolos.Divisao or \
                     self.termo[1] == Simbolos.Positivo or \
                     self.termo[1] == Simbolos.Negativo:
+                # A tratativa é realizada no sintatico, aqui apenas verificamos se foi inserido corretamente durante
+                # a conversão do pós ordem
                 if self.termo[1] == Simbolos.Nao or\
                         self.termo[1] == Simbolos.Positivo or\
                         self.termo[1] == Simbolos.Negativo:
                     pass
                 if self.termo[1] == Simbolos.E or self.termo[1] == Simbolos.Ou:
                     if types[len(types) - 1] != Tipos.Boolean and types[len(types) - 2] != Tipos.Boolean:
-                        #exit("Erro de tipo bool com int, ou tipo errado")
                         Errors.conflictTypeBool(Errors)
 
+                    # E ou OU realizam a comparação utilizando booleano e booleano e seu resultado é em booleano,
+                    # então não precisamos manter os dois, apenas um.
                     x = types[len(types) - 1]
                     types.remove(x)
 
@@ -88,8 +119,10 @@ class Semantico:
                         self.termo[1] == Simbolos.Igual or \
                         self.termo[1] == Simbolos.Diferente:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
-                        #exit("Erro de tipos")
                         Errors.conflictTypeInt(Errors)
+                    # Verificamos se a conta foi realizada utilizando apenas inteiros.
+                    # Caso tenha sido feita de forma correta, devemos trocar os dois inteiros por um booleano, pois é o
+                    # tipo gerado pela operação relacional
                     x = types[len(types) - 1]
                     types.remove(x)
                     x = types[len(types) - 1]
@@ -101,15 +134,18 @@ class Semantico:
                         self.termo[1] == Simbolos.Multiplicacao or \
                         self.termo[1] == Simbolos.Divisao:
                     if types[len(types) - 1] != Tipos.Inteiro and types[len(types) - 2] != Tipos.Inteiro:
-                        #exit("ERRO: Operador deve ser aplicado a um inteiro")
                         Errors.aplicationType(Errors)
+                    # Operadores aritméticos realizam a comparação utilizando inteiro e inteiro e seu
+                    # resultado é em inteiro, então não precisamos manter os dois, apenas um.
                     x = types[len(types) - 1]
                     types.remove(x)
 
             else:
+                # Caso não seja nenhum simbolo, devemos verificar se é algum identificador, numero ou verdadeiro/falso
                 if self.termo[1] == Simbolos.Numero:
                     types.append(Tipos.Inteiro)
                 if self.termo[1] == Simbolos.Identificador:
+                    # Realiza a busca para saber qual o tipo do identificador declarado
                     aux = TabelaDeSimbolos.busca(TabelaDeSimbolos, self.termo[0])
                     if aux[1] == Tipos.Inteiro or aux[1] == Tipos.IntFunction:
                         types.append(Tipos.Inteiro)
@@ -120,13 +156,12 @@ class Semantico:
 
         if tipo == Tipos.IntFunction or tipo == Tipos.Inteiro:
             if Tipos.Inteiro != types[0]:
-                #exit("Expressao Incompativel")
                 Errors.checkTypeInt(Errors)
         if tipo == Tipos.BoolFunction or tipo == Tipos.Boolean:
             if Tipos.Boolean != types[0]:
-                #exit("Expressao booleano incompativel")
                 Errors.checkTypeBool(Errors)
 
+    # Realiza a conversão da nossa expressão em pós ordem
     def posOrdem(self, expressaoin):
         pilha = []
         i = 0
@@ -167,6 +202,7 @@ class Semantico:
             self.posOrdemExpression.append(pilha.pop())
         return self.posOrdemExpression
 
+    # Remove as variaveis definidas no escopo com a ajuda da tabela de simbolos
     def removeSimbolo(self, variables):
         for i in variables:
             TabelaDeSimbolos.remove(TabelaDeSimbolos, i)
