@@ -21,10 +21,11 @@ from Constants.Errors import Errors
 
 
 class Semantico:
-    prioridade = []
+    # Variaveis utilizadas ao longo do programa.
+    # Aqui elas são apenas inicializadas de acordo com o seu tipo
+    # Var = "" (Char) || Var = N (Int) || Var = [] (Struct or Vetor)
     posOrdemExpression = []
     termo = ""
-    lexema = ""
 
     # Define a prioridade de como os simbolos devem ser tratados
     # Caso essa prioriade não seja respeitada, teremos um funcionamento incorreto do modulo
@@ -77,6 +78,7 @@ class Semantico:
 
     # Realiza a analise da nossa expressão pós ordem baseado nas prioridades
     def analisaExpressao(self, expressao, tipo):
+        # Vetor auxiliar contento apenas os tipos de cada identificador/função e o resultado das operações realizadas
         types = []
         # termo = expressão[i], onde i inicia em 0 e vai até o tamanho máximo de expressão
         # expressão = [lexema, simbolo], então termo = expressao[i][lexema, simbolo]
@@ -142,10 +144,12 @@ class Semantico:
 
             else:
                 # Caso não seja nenhum simbolo, devemos verificar se é algum identificador, numero ou verdadeiro/falso
+                # Após a verificação, colocamos o tipo na pilha types
                 if self.termo[1] == Simbolos.Numero:
                     types.append(Tipos.Inteiro)
                 if self.termo[1] == Simbolos.Identificador:
                     # Realiza a busca para saber qual o tipo do identificador declarado
+                    # termo[0] = Lexema, termo[1] = Simbolo
                     aux = TabelaDeSimbolos.busca(TabelaDeSimbolos, self.termo[0])
                     if aux[1] == Tipos.Inteiro or aux[1] == Tipos.IntFunction:
                         types.append(Tipos.Inteiro)
@@ -154,6 +158,7 @@ class Semantico:
                 if self.termo[1] == Simbolos.Verdadeiro or self.termo[1] == Simbolos.Falso:
                     types.append(Tipos.Boolean)
 
+        # Realiza a comparação do tipo da variavel com o que será atribuido a ela
         if tipo == Tipos.IntFunction or tipo == Tipos.Inteiro:
             if Tipos.Inteiro != types[0]:
                 Errors.checkTypeInt(Errors)

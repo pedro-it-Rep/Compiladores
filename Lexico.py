@@ -20,10 +20,17 @@ from Constants.Errors import Errors
 
 # Definição da classe. Definido desta forma para facilitar na transmissão das informações entre os modulos
 class Lexico:
+    # Variaveis utilizadas ao longo do programa.
+    # Aqui elas são apenas inicializadas de acordo com o seu tipo
+    # Var = "" (Char) || Var = N (Int) || Var = [] (Struct or Vetor)
+
+    # Variaveis relacionadas a abertura do arquivo
     file_path = None
     file = None
-    maxChar, i, n_line = 0, 0, 0
-    caracter = ''
+
+    # Variaveis especificas do Lexico
+    maxChar, n_line = 0, 0
+    caracter = ""
     lexema = ""
     simbolo = -1
 
@@ -34,56 +41,51 @@ class Lexico:
                 while self.caracter != '}' and self.caracter != '':
                     # Ler o comentario por completo
                     self.caracter = self.file.read(1)
-                    self.i = self.i + 1
 
                 self.caracter = self.file.read(1)
-                self.i = self.i + 1
 
             while self.caracter.isspace() and self.caracter != '':
                 # Por alguns problemas durante o desenvolvimento, é necessário verificar quando temos que pular linha
                 if self.caracter == '\n':
                     self.n_line += 1
                 self.caracter = self.file.read(1)
-                self.i = self.i + 1
 
         if self.caracter != -1 and self.caracter != '':
             # Self.tokens recebe os lexemas e os simbolos, ficando com a seguinte informação: [Lexema, Simbolo]
-            self.tokens = self.pegaToken(self, self.i)
+            self.tokens = self.pegaToken(self)
             self.lexema = self.tokens[0]
             self.simbolo = self.tokens[1]
 
         return None
 
     # Responsavel por verificar qual é o tipo do caracter lido
-    def pegaToken(self, i):
+    def pegaToken(self):
         # Recebe o caracter do fluxo principal e verifica qual seu tipo e qual função deve ser chamada
         if self.caracter.isdigit():
-            return self.trataDigito(self, i)
+            return self.trataDigito(self)
         elif self.caracter.isalpha():
-            return self.trataIeP(self, i)
+            return self.trataIeP(self)
         elif self.caracter == ":":
-            return self.trataAtribuicao(self, i)
+            return self.trataAtribuicao(self)
         elif self.caracter == "+" or self.caracter == "-" or self.caracter == "*":
-            return self.trataOA(self, i)
+            return self.trataOA(self)
         elif self.caracter == '<' or self.caracter == ">" or self.caracter == "=" or self.caracter == "!":
-            return self.trataOR(self, i)
+            return self.trataOR(self)
         elif self.caracter == ";" or self.caracter == "," or self.caracter == "(" or self.caracter == ")" or self.caracter == ".":
             return self.trataPontuacao(self)
         else:
             Errors.checkCaracter(Errors, self.n_line, self.caracter)
 
     # Trata caso o caracter lido seja um digito
-    def trataDigito(self, i):
+    def trataDigito(self):
 
         num = ""
         num = num + self.caracter
         self.caracter = self.file.read(1)
-        i = i + 1
         # Podemos ter digitos com várias casas, então é necessario verificar isso
         while self.caracter.isdigit():
             num = num + self.caracter
             self.caracter = self.file.read(1)
-            i = i + 1
         self.lexema = num
         self.simbolo = Simbolos.Numero
 
@@ -93,13 +95,12 @@ class Lexico:
     # IeP = Idenficador e Palavra Reservada
     # Função responsavel por verificar se alguma declaração feita durante o programa está utilizando alguma
     # palavra reservada, caso não esteja então temos a declaração de um Identificador (Váriavel).
-    def trataIeP(self, i):
+    def trataIeP(self):
         id = ""
 
         while (self.caracter.isalpha() or self.caracter.isdigit()) or self.caracter == "_":
             id = id + self.caracter
             self.caracter = self.file.read(1)
-            i = i + 1
 
         # Bonito? Não, porém a utilização de switch case não funcionou conforme esperado
         if id == "programa":
@@ -170,11 +171,10 @@ class Lexico:
             return id, self.simbolo
 
     # Realiza a tratativa de uma atribuição a um identificador
-    def trataAtribuicao(self, i):
+    def trataAtribuicao(self):
         id = ""
         id = id + self.caracter
         self.caracter = self.file.read(1)
-        i = i + 1
 
         # Atribuição é identificada com ':=', então é necessario verificar se a ordem está sendo seguida
         if self.caracter != '=':
@@ -183,40 +183,35 @@ class Lexico:
         else:
             id = id + self.caracter
             self.caracter = self.file.read(1)
-            i = i + 1
             self.simbolo = Simbolos.Atribuicao
             return id, self.simbolo
 
     # OA = Operador Aritmético
     # Trata os simbolos aritméticos.
     # OBS: O simbolo de divisão é identificado por DIVI, por isso não tratamos ele aqui
-    def trataOA(self, i):
+    def trataOA(self):
         op = ""
         op = op + self.caracter
 
         if self.caracter == "+":
             self.simbolo = Simbolos.Mais
             self.caracter = self.file.read(1)
-            i = i + 1
             return op, self.simbolo
         elif self.caracter == "-":
             self.simbolo = Simbolos.Menos
             self.caracter = self.file.read(1)
-            i = i + 1
             return op, self.simbolo
         else:
             self.simbolo = Simbolos.Multiplicacao
             self.caracter = self.file.read(1)
-            i = i + 1
             return op, self.simbolo
 
     # OR = Operador Relacional
     # Verifica se os operadores estão escritos de maneira correta
-    def trataOR(self, i):
+    def trataOR(self):
         operadorRelacional = ""
         operadorRelacional = operadorRelacional + self.caracter
         self.caracter = self.file.read(1)
-        i = i + 1
 
         # Podemos ter !=, <=, <, >=, ==
         # Durante o desenvolvido, foi feita a verificação na ordem acima
@@ -226,7 +221,6 @@ class Lexico:
             if self.caracter == '=':
                 operadorRelacional = operadorRelacional + self.caracter
                 self.caracter = self.file.read(1)
-                i = i + 1
                 self.simbolo = Simbolos.Diferente
                 return operadorRelacional, self.simbolo
             else:
@@ -242,7 +236,6 @@ class Lexico:
             if self.caracter == "=":
                 operadorRelacional = operadorRelacional + self.caracter
                 self.caracter = self.file.read(1)
-                i = i + 1
                 self.simbolo = Simbolos.MenorIgual
                 return operadorRelacional, self.simbolo
             # <
@@ -254,7 +247,6 @@ class Lexico:
             if self.caracter == '=':
                 operadorRelacional = operadorRelacional + self.caracter
                 self.caracter = self.file.read(1)
-                i = i + 1
                 self.simbolo = Simbolos.MaiorIgual
                 return operadorRelacional, self.simbolo
             # >

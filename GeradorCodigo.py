@@ -1,4 +1,4 @@
-#                           Modulo Sintático
+#                         Modulo Gerador De Codigo
 # Direitos reservados por Fabricio Silva Cardoso e Pedro Ignácio Trevisan
 #
 # Programa responsavel por criar os comando para a máquina virtual.
@@ -6,7 +6,7 @@
 # Este módulo é responsável por gerar os códigos da máquina virtual de forma que
 # possa ser feita a leitura dessa arquivo pela máquina.
 # As informações iniciais estão separadas por "\t" e o resto das informações
-# separadas por " ", para facilitar a filtragem na máquina virtual
+# separadas por " ", para facilitar o tratamento na máquina virtual
 #
 #
 # O intuito do programa é fazer uma analise completa da linguagem proposta
@@ -14,12 +14,13 @@
 
 import os
 
+
 # Inicializa o arquivo com um nome padrão
 class GeradorDeCodigo:
     arquivo = "geral1.obj"
     f1 = arquivo
 
-    #Verfica se o arquivo já foi criado
+    # Verfica se o arquivo já foi criado
     # Caso positivo, sobrescreve, caso negativo, cria
     def isCreated(self):
         if os.path.exists(self.arquivo):
@@ -29,7 +30,7 @@ class GeradorDeCodigo:
             with open(self.arquivo, "w") as self.f1:
                 pass
 
-    #Gera o comando NULL no nosso arquivo
+    # Gera o comando NULL no nosso arquivo
     def geraRotulo(self, n):
         with open(self.arquivo, "a+") as self.f1:
             self.f1.write("{} \t{} \n".format(n, "NULL"))
@@ -51,3 +52,4 @@ class GeradorDeCodigo:
 
     def closeFile(self):
         self.f1.close()
+
