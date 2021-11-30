@@ -1,9 +1,26 @@
+#                           Modulo Exec
+# Direitos reservados por Fabricio Silva Cardoso e Pedro Ignácio Trevisan
+#
+# Programa responsável por analisar o arquivo filtrado e executar as intruções geradas.
+#
+# Este módulo é responsável para executar os comandos que foram escritos pelo arquivo gerado pelo
+# compilador.
+#
+#
+# O intuito do programa é fazer uma analise completa da linguagem proposta
+# pelo professor a ponto de compor um sistema, sendo este o nosso compilador.
+
+
 from MaquinaVirtual.VM import VM
 from tkinter import *
 
 class Exec:
+    # Varáveis responsáveis para receber a tela onde será exibida os resultados.
+    # Mostra na pilha
     eitas = None
+    # Mostra na raiz da tela
     eitas2 = None
+    # Mostra no PC
     eitas4= None
     flag = 0
     i = -1
@@ -24,12 +41,19 @@ class Exec:
 
     top = Toplevel()
     entry = Entry(top, width=20)
+    #Variável para receber o input e travar quando for pra fazer o read
     number = IntVar()
 
+    # Função responsável por executar o programa em paço a paço
+    # Cada vez que chama essa função ela vai para próxima instrução
     def exec(self):
         if self.endProg != 1:
             self.auxGeralzao = VM.geralzao
+            #self.geralzao recebe todas as linhas do arquivo em forma de vetor, ou seja,
+            #cada posição do vetor representa uma instrução e seus atributos, se tiver
             self.operation = self.auxGeralzao[self.pc][1]
+            #self.operation inicializa com a instrução [0, "START"]
+            #Flag responsãvel por limpar as "TreeView" da máquina virtual
             if self.clearflag == 1:
                 self.clearStack(self)
                 self.clearInstru(self)
@@ -279,6 +303,7 @@ class Exec:
                 self.pilha.pop()
                 self.printStack(self)
 
+    #Função responsável por rodar sozinho e só parar para colocar o input
     def exec2(self):
         self.auxGeralzao = VM.geralzao
         self.endFile = VM.maxSize
@@ -450,20 +475,24 @@ class Exec:
             elif self.operation == "RD":
                 # S := s + 1; M[s] := proxima entra
                 # READ Variable
+                # Criar o lugar para gerar o input
                 self.printStack(self)
                 self.top.title("Insira o numero")
                 self.top.geometry("300x200")
                 self.entry.pack()
+                # Não ter botão duplicado
                 if self.createdButton == 0:
                     button = Button(self.top, text="Insert", command=lambda: self.insertValue(self))
                     button.pack()
                     self.createdButton = 1
+                #Trava o programa até colocar um input
                 self.top.wait_variable(self.number)
                 self.pilha.append([len(self.pilha), self.number.get()])
                 self.pc += 1
 
             elif self.operation == "PRN":
                 # M[s]; s := s - 1;
+                #Armzaena em outro vetor para printar a saida
                 self.saida.append(self.pilha[len(self.pilha) - 1])
                 self.pilha.pop()
                 self.pc += 1
@@ -502,20 +531,24 @@ class Exec:
                 self.pc = int(self.pilha[len(self.pilha) - 1][1])
                 self.pilha.pop()
 
+    # Printa o resultado na pilha
     def printStack(self):
         for i in self.pilha:
             self.eitas.insert('','end',values=(i[0], i[1]))
-
+    # Limpa a pilha
     def clearStack(self):
         for i in self.eitas.get_children():
             self.eitas.delete(i)
 
+    # Mostra a instrução a ser executada
     def printInstru(self):
         self.eitas4.insert('', 'end', values=(self.auxGeralzao[self.pc][0], self.auxGeralzao[self.pc][1]))
 
+    #Limpa a instrução
     def clearInstru(self):
         for i in self.eitas4.get_children():
             self.eitas4.delete(i)
 
+    #Recebe o valor do input
     def insertValue(self):
         self.number.set(self.entry.get())
