@@ -222,6 +222,7 @@ class Sintatico:
             Errors.exceptionAbreParenteses(Errors, Lexico.n_line)
 
     def analisaEnquanto(self):
+        GeradorDeCodigo.geraRotulo(GeradorDeCodigo, self.proxRotulo)
         aux = self.proxRotulo
         self.proxRotulo += 1
 
@@ -235,6 +236,7 @@ class Sintatico:
         Semantico.analisaExpressao(Semantico, self.expressao, self.tipo)
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.JumpIfFalse, self.proxRotulo)
         aux2 = self.proxRotulo
+        #self.proxRotulo += 1
 
         if Lexico.simbolo == Simbolos.Faca:
             Lexico.Token(Lexico)
