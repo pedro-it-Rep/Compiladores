@@ -1,3 +1,20 @@
+#                           Modulo Sintático
+# Direitos reservados por Fabricio Silva Cardoso e Pedro Ignácio Trevisan
+#
+# Programa responsavel por analisar de forma semantica o arquivo recebido no modulo lexical.
+#
+# Este módulo é o corpo principal do compilador, onde chama todas as funções dos outros arquivos,
+# direcionando para o fim do arquivo lide e criando o compilador e seu código de máquina. Ele trabalha
+# com a chamada do lexico, onde gera tokens para ser analisado pelo sintatico e redirecionar cada token
+# para seu devido lugar, chamando os outros arquivos.
+#
+# Todos os simbolos estão disponiveis no arquivo Simbolos.py
+# Todos os tipos estão disponiveis no arquivo Tipos.py
+# Todos os comando estão disponíveis no arquivo Comandos.py
+#
+# O intuito do programa é fazer uma analise completa da linguagem proposta
+# pelo professor a ponto de compor um sistema, sendo este o nosso compilador.
+
 from Constants.Errors import Errors
 from Constants.Simbolos import Simbolos
 from Lexico import Lexico
@@ -22,11 +39,16 @@ class Sintatico:
     tela1 = None
     Errors.sla = tela1
 
+    # Inicializa a leitura do arquivo, recebendo o token ["nomedoprograma", "sprograma"] de inicio.
+    # Declara na pilha o endereço 0 para retorno de função.
+    # Executa o corpo do arquivo.
+    # Declara a desalocação do valor de retorno da função.
     def Sintatico(self):
         GeradorDeCodigo.isCreated(GeradorDeCodigo)
         Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.Programa:
             GeradorDeCodigo.geraComando(GeradorDeCodigo, Comandos.Start)
+            #Aloca as váriaveis por linha
             GeradorDeCodigo.geraComando2Var(GeradorDeCodigo, Comandos.Allocate, self.End, self.proxEnd)
             Lexico.Token(Lexico)
 
@@ -39,6 +61,7 @@ class Sintatico:
                     variables = TabelaDeSimbolos.getVariables(TabelaDeSimbolos)
                     GeradorDeCodigo.geraComando2Var(GeradorDeCodigo, Comandos.Deallocate,
                                                     (self.proxEnd - len(variables)), len(variables))
+                    # Desaloca todas as variáveis declaradas
                     GeradorDeCodigo.geraComando2Var(GeradorDeCodigo, Comandos.Deallocate, self.End,
                                                     self.proxEnd - len(variables))
                     Semantico.removeSimbolo(Semantico, variables)
@@ -63,19 +86,24 @@ class Sintatico:
                 Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
         else:
             Errors.exceptionMissingPrograma(Errors, Lexico.n_line)
-
+    # Decide qual o próximo passo
     def analisaBloco(self):
         Lexico.Token(Lexico)
         self.analisa_et_variaveis(self)
         self.analisaSubrotina(self)
         self.analisaComandos(self)
 
+    # Verica se é variável.
+    # Termina quando le um ";"
     def analisa_et_variaveis(self):
+        #Token ["var", "svar"]
         if Lexico.simbolo == Simbolos.Var:
             Lexico.Token(Lexico)
 
             if Lexico.simbolo == Simbolos.Identificador:
                 while Lexico.simbolo == Simbolos.Identificador:
+                    # Recebe o nome da variável e faz a leitura de todas as variáveis
+                    # Até encontrar ":"
                     self.analisaVariaveis(self)
                     if Lexico.simbolo == Simbolos.PontoVirgula:
                         Lexico.Token(Lexico)
@@ -84,6 +112,9 @@ class Sintatico:
             else:
                 Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
 
+    #Declara a varriável.
+    #Verfica se já foi declarado a variável.
+    # Atribui o tipo para as variáveis
     def analisaVariaveis(self):
         self.nVars = 0
         while Lexico.simbolo != Simbolos.DoisPontos:
@@ -113,6 +144,7 @@ class Sintatico:
         Lexico.Token(Lexico)
         self.analisaTipo(self)
 
+    #Atribui os tipos para as variáveis e reserva na Tabela de Símbolos
     def analisaTipo(self):
         if Lexico.simbolo != Simbolos.Inteiro and Lexico.simbolo != Simbolos.Booleano:
             Errors.exceptionTypeInvalid(Errors, Lexico.n_line)
@@ -125,6 +157,8 @@ class Sintatico:
         Lexico.Token(Lexico)
         self.nVars = 0
 
+    # Faz a leitura do corpo do código
+    # Faz a leitura até encontrar um "fim"
     def analisaComandos(self):
         if Lexico.simbolo == Simbolos.Inicio:
             Lexico.Token(Lexico)
@@ -142,6 +176,8 @@ class Sintatico:
         else:
             Errors.exceptionMissingStart(Errors, Lexico.n_line)
 
+    # Verifica se o símbolo é um procedimento ou alguma variável
+    # Caso não seja, verifica se é uma condição ou ação
     def analisaComandoSimples(self):
         if Lexico.simbolo == Simbolos.Identificador:
             if TabelaDeSimbolos.isDeclarado(TabelaDeSimbolos, Lexico.lexema):
@@ -160,8 +196,9 @@ class Sintatico:
             else:
                 self.analisaComandos(self)
 
+    # Verfica se o indentificador lido foi uma variável ou procedimento.
+    # Guarda a váriavel para usar na atribuição.
     def analisa_atrib_chprocedimento(self):
-
         self.identificador = []
         self.identificador = TabelaDeSimbolos.busca(TabelaDeSimbolos, Lexico.lexema)
         Lexico.Token(Lexico)
@@ -171,6 +208,8 @@ class Sintatico:
         else:
             self.chamadaProcedimento(self)
 
+    # Caso seja ação "ler", verifica se o indetificador dentro do parametro é válido
+    # Token ["leia", "sleia"]
     def analisaLeia(self):
         Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.AbreParenteses:
@@ -193,6 +232,8 @@ class Sintatico:
         else:
             Errors.exceptionAbreParenteses(Errors, Lexico.n_line)
 
+    # Caso seja ação "escrever", verifica se o indetificador dentro do parametro é função ou variável, e se é válido
+    # Token ["escreve", "sescreve"]
     def analisaEscreva(self):
         Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.AbreParenteses:
@@ -221,8 +262,11 @@ class Sintatico:
         else:
             Errors.exceptionAbreParenteses(Errors, Lexico.n_line)
 
+    # Analisa a expressão da condição.
+    # Gera os códigos da máquina.
+    # Analisa o corpo da condição.
+    # Token ["enquanto", "senquanto"]
     def analisaEnquanto(self):
-        GeradorDeCodigo.geraRotulo(GeradorDeCodigo, self.proxRotulo)
         aux = self.proxRotulo
         self.proxRotulo += 1
 
@@ -236,7 +280,6 @@ class Sintatico:
         Semantico.analisaExpressao(Semantico, self.expressao, self.tipo)
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.JumpIfFalse, self.proxRotulo)
         aux2 = self.proxRotulo
-        #self.proxRotulo += 1
 
         if Lexico.simbolo == Simbolos.Faca:
             Lexico.Token(Lexico)
@@ -248,6 +291,10 @@ class Sintatico:
 
         GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux2)
 
+    # Analisa a expressão da condição.
+    # Gera os códigos da máquina.
+    # Analisa o corpo da condição.
+    # Token ["se", "sse"]
     def analisaSe(self):
 
         Lexico.Token(Lexico)
@@ -278,8 +325,11 @@ class Sintatico:
         else:
             Errors.exceptionInvalidIfDo(Errors, Lexico.n_line)
 
+    # Verficai se é função ou procedimento
     def analisaSubrotina(self):
         self.nVars = 0
+        #Flag para controlar quando deve printa o NULL
+        #Printa caso o simbolo seja um procedimento ou função
         flag = 0
         if Lexico.simbolo == Simbolos.Procedimento or Lexico.simbolo == Simbolos.Funcao:
             GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Jump, self.proxRotulo)
@@ -295,17 +345,19 @@ class Sintatico:
             if Lexico.simbolo == Simbolos.PontoVirgula:
                 Lexico.Token(Lexico)
             else:
-
                 Errors.exceptionPontoVirgula(Errors, Lexico.n_line)
-
         if flag == 1:
             GeradorDeCodigo.geraRotulo(GeradorDeCodigo, aux)
 
+    # Analisa as variáveis, os procedimentos e o corpo da função.
     def analisaDeclaraFunc(self):
         Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.Identificador:
+            # Verifica se o indentificador já foi criado
             if not TabelaDeSimbolos.isDeclaradoNoEscopo(TabelaDeSimbolos, Lexico.lexema):
                 TabelaDeSimbolos.insereTabela(TabelaDeSimbolos, Lexico.lexema, Tipos.Function, True, None)
+                # Pega todas as informações contidas nesse procedimento
+                # self.found["nomedoidentificador","símbolodoidentifcador","layer","posiçãodamemória"]
                 GeradorDeCodigo.geraRotulo(GeradorDeCodigo, self.proxRotulo)
                 self.found = TabelaDeSimbolos.busca(TabelaDeSimbolos, Lexico.lexema)
                 self.found[3] = self.proxRotulo
@@ -342,9 +394,12 @@ class Sintatico:
     def analisaDeclaracaoProc(self):
         Lexico.Token(Lexico)
         if Lexico.simbolo == Simbolos.Identificador:
+            # Verifica se o indentificador já foi criado
             if not TabelaDeSimbolos.isDeclaradoNoEscopo(TabelaDeSimbolos, Lexico.lexema):
                 TabelaDeSimbolos.insereTabela(TabelaDeSimbolos, Lexico.lexema, Tipos.Procedimento, True, None)
                 GeradorDeCodigo.geraRotulo(GeradorDeCodigo, self.proxRotulo)
+                # Pega todas as informações contidas nesse procedimento
+                #self.found["nomedoidentificador","símbolodoidentifcador","layer","posiçãodamemória"]
                 self.found = TabelaDeSimbolos.busca(TabelaDeSimbolos, Lexico.lexema)
                 self.found[3] = self.proxRotulo
                 self.proxRotulo += 1
@@ -353,6 +408,7 @@ class Sintatico:
                 if Lexico.simbolo == Simbolos.PontoVirgula:
                     self.analisaBloco(self)
                     variables = TabelaDeSimbolos.getVariables(TabelaDeSimbolos)
+                    #Caso não tem variável para ser declarada, não precisa dar dalloc
                     if len(variables) == 0:
                         pass
                     else:
@@ -370,6 +426,7 @@ class Sintatico:
         else:
             Errors.exceptionMissingIdentifier(Errors, Lexico.n_line)
 
+    # Analisa a expressão seguida da condição
     def analisaExpressao(self):
         self.analisaExpressaoSimples(self)
         if Lexico.simbolo == Simbolos.Maior or Lexico.simbolo == Simbolos.MaiorIgual or \
@@ -379,6 +436,7 @@ class Sintatico:
             Lexico.Token(Lexico)
             self.analisaExpressaoSimples(self)
 
+    # Verifica qual é o sinal da variável e qual é o simbolo lógico
     def analisaExpressaoSimples(self):
         if Lexico.simbolo == Simbolos.Mais or Lexico.simbolo == Simbolos.Menos:
             self.expressao.append([Lexico.lexema, Lexico.simbolo])
@@ -389,6 +447,7 @@ class Sintatico:
             Lexico.Token(Lexico)
             self.analisaTermo(self)
 
+    # Verifica qual é o operador ou qual é o simbolo lógico
     def analisaTermo(self):
         self.analisaFator(self)
         while Lexico.simbolo == Simbolos.Multiplicacao or Lexico.simbolo == Simbolos.Divisao or Lexico.simbolo == Simbolos.E:
@@ -396,6 +455,7 @@ class Sintatico:
             Lexico.Token(Lexico)
             self.analisaFator(self)
 
+    #Verifica se o símbolo é um identificador, número, um sabre ou fecha parenteses, uma negação ou se é verdadeiro ou falso
     def analisaFator(self):
         if Lexico.simbolo == Simbolos.Identificador:
             if TabelaDeSimbolos.isDeclarado(TabelaDeSimbolos, Lexico.lexema):
@@ -428,6 +488,8 @@ class Sintatico:
         else:
             Errors.exceptionInvalidExpression(Errors, Lexico.n_line)
 
+    # Analisa a expressão seguida do sinal de recebe ":=", se ela é válida
+    # E verifica se a atribuição é válida também
     def analisaAtribuicao(self):
         Lexico.Token(Lexico)
 
@@ -441,6 +503,9 @@ class Sintatico:
         self.nVars = len(TabelaDeSimbolos.getVariables(TabelaDeSimbolos))
 
         if self.identificador[1] == Tipos.Boolean or self.identificador[1] == Tipos.IntFunction:
+            #Faz a subtração de -4, pois é para remover da contagem o end de retorno da função
+            #
+            #
             GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Store, (self.proxEnd - self.nVars - 4))
         else:
             GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Store, self.identificador[3])
@@ -453,6 +518,9 @@ class Sintatico:
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.Call, self.found[3])
         GeradorDeCodigo.geraComando1Var(GeradorDeCodigo, Comandos.LoadValue, 0)
 
+    # Com a expressao gerado pelo analisa expressao, receberemos a expressão como um vetor, antes de passar pra pós-ordem
+    # Passaremos por cada posição do vetor verficando se o que vem antes de um número ou identificador
+    # Pode estar relacionado ao sinal do núemro ou identificador
     def subUnarios(self):
         i = 0
         while i < len(self.expressao):
@@ -478,8 +546,14 @@ class Sintatico:
                         self.expressao[i][1] = Simbolos.Negativo
             i += 1
 
+    # Após ter gerado a expressão e colocado ela em pós-ordem
+    # Agora analisamos em forma de pós-ordem e geramos seu cógigo para máquina virtual
+    # De cada elemento do vetor
     def geraExpressao(self):
         for i in self.expressao:
+            # self.expressao com todos os lexemas e simbolos necessários
+            # Para criar o código de máquina
+            # i[lexema][simbolo]
             if i[1] == Simbolos.Identificador:
                 if TabelaDeSimbolos.isDeclarado(TabelaDeSimbolos, i[0]):
                     self.found = TabelaDeSimbolos.busca(TabelaDeSimbolos, i[0])
